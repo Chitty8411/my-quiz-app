@@ -14,7 +14,7 @@ st.set_page_config(
 
 st.markdown("""
     <style>
-    /* 彻底隐藏 Streamlit 默认头部工具栏，回收顶部状态栏高度，防止遮挡 */
+    /* 彻底隐藏 Streamlit 默认头部工具栏，回收顶部状态栏高度，实现 100% 满屏展示 */
     header[data-testid="stHeader"] {
         display: none !important;
         height: 0px !important;
