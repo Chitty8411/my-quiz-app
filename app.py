@@ -219,6 +219,29 @@ st.markdown("""
     .stProgress > div > div > div > div {
         background-color: #2563eb !important;
     }
+
+    /* ======================================================== */
+    /* 针对结业结算页：个性化定制并排按钮色彩，达成极佳视觉指示 */
+    /* ======================================================== */
+    /* 1. 针对错题重新挑战：高能炫目橙红渐变 */
+    .stHorizontalBlock > div:nth-child(1) button[kind="primary"] {
+        background: linear-gradient(90deg, #f97316 0%, #ef4444 100%) !important;
+        box-shadow: 0 4px 14px rgba(239, 68, 68, 0.28) !important;
+    }
+    .stHorizontalBlock > div:nth-child(1) button[kind="primary"]:active {
+        transform: scale(0.97) !important;
+        box-shadow: 0 2px 6px rgba(239, 68, 68, 0.15) !important;
+    }
+
+    /* 2. 重新挑战完整题库：清新璀璨翡翠绿渐变 */
+    .stHorizontalBlock > div:nth-child(2) button[kind="primary"] {
+        background: linear-gradient(90deg, #10b981 0%, #059669 100%) !important;
+        box-shadow: 0 4px 14px rgba(16, 185, 129, 0.28) !important;
+    }
+    .stHorizontalBlock > div:nth-child(2) button[kind="primary"]:active {
+        transform: scale(0.97) !important;
+        box-shadow: 0 2px 6px rgba(16, 185, 129, 0.15) !important;
+    }
     </style>
 """, unsafe_allow_html=True)
 
@@ -476,37 +499,37 @@ else:
     else:
         grade_comment = "💪 再接再厉！坚持不懈，错题集是你的通关秘籍！"
 
-    # 精美渐变结业战报 HTML 卡片展示在最上方 - 极致贴顶并缩紧内边距
+    # 精美渐变结业战报 HTML 卡片展示在最上方 - 极致贴顶并拉高上下高度(padding: 45px 16px)
     st.markdown(f"""
-        <div style="background: linear-gradient(135deg, #0f2b5c 0%, #1e40af 100%); color: white; padding: 20px 14px; border-radius: 16px; box-shadow: 0 10px 25px rgba(30, 64, 175, 0.15); margin-top: 8px; margin-bottom: 16px; text-align: center;">
-            <div style="font-size: 22px; font-weight: 800; margin-bottom: 4px; letter-spacing: 0.5px;">🏆 泰圣奇刷题结业战报</div>
-            <div style="font-size: 12px; opacity: 0.8; margin-bottom: 14px;">恭喜您完成了本次的全部挑战！</div>
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 14px;">
-                <div style="background: rgba(255, 255, 255, 0.1); padding: 10px; border-radius: 12px; text-align: center; border: 1px solid rgba(255,255,255,0.05);">
+        <div style="background: linear-gradient(135deg, #0f2b5c 0%, #1e40af 100%); color: white; padding: 45px 16px; border-radius: 16px; box-shadow: 0 10px 25px rgba(30, 64, 175, 0.15); margin-top: 8px; margin-bottom: 16px; text-align: center;">
+            <div style="font-size: 22px; font-weight: 800; margin-bottom: 10px; letter-spacing: 0.5px;">🏆 泰圣奇刷题结业战报</div>
+            <div style="font-size: 13px; opacity: 0.8; margin-bottom: 24px;">恭喜您完成了本次的全部挑战！</div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 24px;">
+                <div style="background: rgba(255, 255, 255, 0.1); padding: 12px; border-radius: 12px; text-align: center; border: 1px solid rgba(255,255,255,0.05);">
                     <div style="font-size: 11px; opacity: 0.8; margin-bottom: 3px;">⏱️ 刷题用时</div>
                     <div style="font-size: 16px; font-weight: 700; color: #ffffff;">{time_display_str}</div>
                 </div>
-                <div style="background: rgba(255, 255, 255, 0.1); padding: 10px; border-radius: 12px; text-align: center; border: 1px solid rgba(255,255,255,0.05);">
+                <div style="background: rgba(255, 255, 255, 0.1); padding: 12px; border-radius: 12px; text-align: center; border: 1px solid rgba(255,255,255,0.05);">
                     <div style="font-size: 11px; opacity: 0.8; margin-bottom: 3px;">🎯 本次胜率</div>
                     <div style="font-size: 16px; font-weight: 700; color: #10b981;">{final_accuracy}%</div>
                 </div>
-                <div style="background: rgba(255, 255, 255, 0.1); padding: 10px; border-radius: 12px; text-align: center; border: 1px solid rgba(255,255,255,0.05);">
+                <div style="background: rgba(255, 255, 255, 0.1); padding: 12px; border-radius: 12px; text-align: center; border: 1px solid rgba(255,255,255,0.05);">
                     <div style="font-size: 11px; opacity: 0.8; margin-bottom: 3px;">✅ 答对题数</div>
                     <div style="font-size: 16px; font-weight: 700; color: #34d399;">{st.session_state.score} 题</div>
                 </div>
-                <div style="background: rgba(255, 255, 255, 0.1); padding: 10px; border-radius: 12px; text-align: center; border: 1px solid rgba(255,255,255,0.05);">
+                <div style="background: rgba(255, 255, 255, 0.1); padding: 12px; border-radius: 12px; text-align: center; border: 1px solid rgba(255,255,255,0.05);">
                     <div style="font-size: 11px; opacity: 0.8; margin-bottom: 3px;">❌ 答错题数</div>
                     <div style="font-size: 16px; font-weight: 700; color: #f87171;">{len(st.session_state.wrong_questions)} 题</div>
                 </div>
             </div>
-            <div style="border-top: 1px solid rgba(255, 255, 255, 0.15); padding-top: 12px; font-size: 13px; font-weight: 700; color: #f3f4f6; letter-spacing: 0.5px;">
+            <div style="border-top: 1px solid rgba(255, 255, 255, 0.15); padding-top: 16px; font-size: 13px; font-weight: 700; color: #f3f4f6; letter-spacing: 0.5px;">
                 {grade_comment}
             </div>
         </div>
     """, unsafe_allow_html=True)
     
     if st.session_state.wrong_questions:
-        # 错题回顾上方的完美并排重新挑战按钮（现在挪到战报下方，错题上方）
+        # 错题回顾上方的完美并排重新挑战按钮（现在挪到战报下方，错题上方，并赋予震撼拼色）
         col_w1, col_w2 = st.columns(2)
         with col_w1:
             if st.button("🔥 针对错题重新挑战", type="primary", use_container_width=True):
