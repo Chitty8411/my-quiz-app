@@ -4,7 +4,6 @@ import random
 import time
 import streamlit.components.v1 as components
 
-# 针对手机屏幕进行终极美化配置，强制折叠侧边栏并设定标题
 st.set_page_config(
     page_title="泰圣奇知识刷题系统", 
     page_icon="📱", 
@@ -12,18 +11,28 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
-# ========================================================
-# 【极速渗透锁定浅色主题】彻底屏蔽系统深色模式（Dark Mode）对文字、选项、背景的任何反色干扰
-# ========================================================
 st.markdown("""
     <style>
-    /* 彻底锁定底层系统变量，使其在手机切换深色模式时仍强制指向亮白色主题 */
+    /* ========================================================
+       【终极硬核浅色模式锁定】彻底解除微信/iOS内置浏览器深色反色滤镜
+       ======================================================== */
     :root {
         --primary-color: #1a52a5 !important;
         --background-color: #f8fafc !important;
         --secondary-background-color: #ffffff !important;
         --text-color: #1e293b !important;
         color-scheme: light !important;
+    }
+    
+    /* 强力锁定渲染上下文为浅色模式，禁用系统/浏览器级别的反色和色彩调节 */
+    html, body, [data-testid="stAppViewContainer"], .stApp, 
+    div[data-testid="stRadio"], div[data-testid="stCheckbox"], 
+    div[data-baseweb="checkbox"], div[data-baseweb="radio"],
+    div[data-baseweb="checkbox"] *, div[data-baseweb="radio"] * {
+        color-scheme: light !important;
+        supported-color-schemes: light !important;
+        filter: none !important;
+        -webkit-filter: none !important;
     }
     
     /* 彻底隐藏 Streamlit 默认头部工具栏，回收顶端高度 */
@@ -33,67 +42,7 @@ st.markdown("""
         visibility: hidden !important;
     }
     
-    /* 强力锁定浅色模式：覆盖手机系统深色主题样式拦截 */
-    @media (prefers-color-scheme: dark) {
-        html, body, [data-testid="stAppViewContainer"], .stApp {
-            background-color: #f8fafc !important;
-            color: #1e293b !important;
-        }
-        h1, h2, h3, h4, h5, h6, p, span, label, li, strong, div, .stMarkdown, .stCaption {
-            color: #1e293b !important;
-        }
-        /* 选项卡片抗深色模式变黑 */
-        div[data-testid="stRadio"] label, div[data-testid="stCheckbox"] label {
-            background-color: #ffffff !important;
-            border-color: #e2e8f0 !important;
-        }
-        div[data-testid="stRadio"] label p, div[data-testid="stCheckbox"] label p {
-            color: #334155 !important;
-        }
-        /* 题干卡片、错题回顾卡片抗色变 */
-        .question-card, .wrong-question-card {
-            background-color: #ffffff !important;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02) !important;
-        }
-        .question-title {
-            color: #1e293b !important;
-        }
-        /* 强制覆盖Streamlit内置的多媒体组件反色 */
-        .stSelectbox div, .stTextInput input, .stTextArea textarea {
-            color: #1e293b !important;
-            background-color: #ffffff !important;
-        }
-    }
-    
-    /* 解决手机端由于深色模式自动反色导致的复选框和单选框变黑（黑色实心小方块）的问题 */
-    div[data-baseweb="checkbox"] > div:first-child,
-    div[data-baseweb="radio"] > div:first-child {
-        background-color: #ffffff !important;
-        border-color: #cbd5e1 !important;
-    }
-    /* 单选/复选被选中时，强制保持活力蓝色，防止在深色模式下变成灰黑色 */
-    div[data-baseweb="checkbox"] input:checked + div,
-    div[data-baseweb="radio"] input:checked + div {
-        background-color: #1a52a5 !important;
-        border-color: #1a52a5 !important;
-    }
-    div[data-baseweb="checkbox"] [checked] ~ div,
-    div[data-baseweb="radio"] [checked] ~ div {
-        background-color: #1a52a5 !important;
-        border-color: #1a52a5 !important;
-    }
-
-    /* 全局背景色调 */
-    .stApp {
-        background-color: #f8fafc !important;
-    }
-    
-    /* 强力压缩 Streamlit 容器内部小部件的纵向默认间距，确保一屏展示 */
-    [data-testid="stVerticalBlock"] > div {
-        gap: 0.4rem !important;
-    }
-    
-    /* 隐藏顶部白边，降低内边距，挤压出首屏空间 */
+    /* 极窄贴顶：隐藏顶部白边，高度自适应 */
     .block-container {
         padding-top: 0px !important;
         padding-bottom: 0.5rem !important;
@@ -101,7 +50,94 @@ st.markdown("""
         padding-right: 0.75rem !important;
     }
     
-    /* 顶部渐变状态卡片 - 缩减内边距与高度 */
+    /* 强力压缩 Streamlit 容器内部小部件的纵向默认间距，确保一屏展示 */
+    [data-testid="stVerticalBlock"] > div {
+        gap: 0.4rem !important;
+    }
+    
+    /* ========================================================
+       【精准暗黑模式覆盖】拒绝任何系统或媒体查询将卡片或复选框反色
+       ======================================================== */
+    @media (prefers-color-scheme: dark) {
+        html, body, [data-testid="stAppViewContainer"], .stApp {
+            background-color: #f8fafc !important;
+            color: #1e293b !important;
+        }
+        
+        /* 1. 题干与错题回顾卡片：拒绝反色，强制浅色背景与高对比度文字 */
+        .question-card, .wrong-question-card {
+            background-color: #ffffff !important;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02) !important;
+        }
+        .question-title {
+            color: #1e293b !important;
+        }
+        
+        /* 2. 选项卡片：拒绝变黑，锁死白底灰框 */
+        div[data-testid="stRadio"] label, div[data-testid="stCheckbox"] label {
+            background-color: #ffffff !important;
+            border-color: #e2e8f0 !important;
+        }
+        div[data-testid="stRadio"] label p, div[data-testid="stCheckbox"] label p {
+            color: #334155 !important;
+        }
+        
+        /* 3. 进度卡片：拒绝变暗，锁死纯白字体 */
+        .dashboard-card, .dashboard-card * {
+            color: #ffffff !important;
+        }
+        .dashboard-title {
+            color: rgba(255, 255, 255, 0.8) !important;
+        }
+        .dashboard-value {
+            color: #ffffff !important;
+        }
+        
+        /* 4. 主副按钮：确保高亮文字始终保持清晰白色 */
+        .stButton > button, .stButton > button * {
+            color: #ffffff !important;
+        }
+    }
+    
+    /* ========================================================
+       【重装复选框/单选框防黑化规则】彻底解决图一中的黑色块
+       ======================================================== */
+    /* 针对未选中状态：使用轻微的非纯白色以绕过部分浏览器的智能反色，同时锁定边框 */
+    div[data-baseweb="checkbox"] > div:first-child,
+    div[data-baseweb="radio"] > div:first-child {
+        background-color: #f8fafc !important;
+        border: 2px solid #cbd5e1 !important;
+        border-radius: 4px !important;
+        box-shadow: none !important;
+        filter: none !important;
+        -webkit-filter: none !important;
+    }
+    
+    /* 针对单选框（Radio）的圆形外观复原 */
+    div[data-baseweb="radio"] > div:first-child {
+        border-radius: 50% !important;
+    }
+    
+    /* 被选中状态：强制保持高辨识度的活力宝蓝，防止在深色模式下变成灰黑色 */
+    div[data-baseweb="checkbox"] input:checked + div,
+    div[data-baseweb="radio"] input:checked + div,
+    div[data-baseweb="checkbox"] input:checked ~ div,
+    div[data-baseweb="radio"] input:checked ~ div {
+        background-color: #1a52a5 !important;
+        border-color: #1a52a5 !important;
+        filter: none !important;
+        -webkit-filter: none !important;
+    }
+
+    /* 全局网页背景色调 */
+    .stApp {
+        background-color: #f8fafc !important;
+    }
+    
+    /* ========================================================
+       【卡片与模块排版精细化】
+       ======================================================== */
+    /* 顶部渐变状态卡片 - 极佳高度与紧凑感 */
     .dashboard-card {
         background: linear-gradient(135deg, #0f2b5c 0%, #1a52a5 100%);
         color: white;
@@ -118,6 +154,7 @@ st.markdown("""
         opacity: 0.8;
         font-weight: 500;
         margin-bottom: 2px;
+        color: #ffffff;
     }
     
     .dashboard-value {
@@ -186,14 +223,17 @@ st.markdown("""
         box-shadow: 0 3px 8px rgba(26, 82, 165, 0.06) !important;
     }
     
-    /* 调整原生选择圈/方框的间距 */
+    /* 调整单选框与复选框文字的字号及颜色 */
     div[data-testid="stRadio"] label p, div[data-testid="stCheckbox"] label p {
         font-size: 14px !important;
         color: #334155 !important;
         font-weight: 500 !important;
     }
     
-    /* 提交答案和重置进度核心按钮 - 高度强制放大至 52px 以实现极致舒适的拇指点按体验 */
+    /* ========================================================
+       【按钮极致加高美化：舒适大拇指点按体验】
+       ======================================================== */
+    /* 提交答案和重置进度核心按钮 - 高度设定为 52px，渐变蓝 */
     .stButton>button[kind="primary"] {
         width: 100% !important;
         height: 52px !important;
@@ -235,7 +275,10 @@ st.markdown("""
         transform: scale(0.97) !important;
     }
     
-    /* 【原生类霸道锁定】彻底解禁 Flex 行换行，确保手机端两个列永远在一条横线上并列摆放 */
+    /* ========================================================
+       【重构原生双列并排机制：锁定两端无缝齐平】
+       ======================================================== */
+    /* 彻底解禁 Flex 行换行，确保手机端两个列永远在一条横线上并列摆放 */
     .stHorizontalBlock,
     .stHorizontalBlock > div {
         display: flex !important;
@@ -269,7 +312,7 @@ st.markdown("""
 
     .stColumn button p,
     .stColumn button span {
-        font-size: 14px !important; /* 【完美对齐】完美恢复为与主按钮一致的标准字号 */
+        font-size: 14px !important; /* 完美恢复为与主按钮一致的标准字号 */
         white-space: normal !important; /* 在超窄屏幕上优雅折行，绝不向两边挤爆出屏外 */
         line-height: 1.15 !important;
         letter-spacing: -0.5px !important;
@@ -324,7 +367,7 @@ current_num = st.session_state.current_index + 1
 accuracy = int((st.session_state.score / st.session_state.total_answered * 100)) if st.session_state.total_answered > 0 else 0
 
 if st.session_state.current_index < len(st.session_state.order):
-    # 使用原生 Flexbox 高级排版机制，完美对齐下方即将重修的并排按钮
+    # 使用原生 Flexbox 高级排版机制，完美对齐下方并排按钮
     st.markdown(f"""
         <div style="display: flex; gap: 8px; margin-bottom: 6px; width: 100%;">
             <div class="dashboard-card" style="flex: 1; margin-bottom: 0;">
@@ -540,28 +583,28 @@ else:
 
     # 精美渐变结业战报 HTML 卡片展示在最上方 - 极致贴顶并拉高上下高度(padding: 45px 16px)
     st.markdown(f"""
-        <div style="background: linear-gradient(135deg, #0f2b5c 0%, #1a52a5 100%); color: white; padding: 45px 16px; border-radius: 16px; box-shadow: 0 10px 25px rgba(26, 82, 165, 0.15); margin-top: 8px; margin-bottom: 16px; text-align: center;">
-            <div style="font-size: 22px; font-weight: 800; margin-bottom: 10px; letter-spacing: 0.5px;">🏆 泰圣奇刷题结业战报</div>
-            <div style="font-size: 13px; opacity: 0.8; margin-bottom: 24px;">恭喜您完成了本次的全部挑战！</div>
+        <div style="background: linear-gradient(135deg, #0f2b5c 0%, #1a52a5 100%); color: white !important; padding: 45px 16px; border-radius: 16px; box-shadow: 0 10px 25px rgba(26, 82, 165, 0.15); margin-top: 8px; margin-bottom: 16px; text-align: center;">
+            <div style="font-size: 22px; font-weight: 800; margin-bottom: 10px; letter-spacing: 0.5px; color: #ffffff !important;">🏆 泰圣奇刷题结业战报</div>
+            <div style="font-size: 13px; opacity: 0.8; margin-bottom: 24px; color: #ffffff !important;">恭喜您完成了本次的全部挑战！</div>
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 24px;">
                 <div style="background: rgba(255, 255, 255, 0.1); padding: 12px; border-radius: 12px; text-align: center; border: 1px solid rgba(255,255,255,0.05);">
-                    <div style="font-size: 11px; opacity: 0.8; margin-bottom: 3px;">⏱️ 刷题用时</div>
-                    <div style="font-size: 16px; font-weight: 700; color: #ffffff;">{time_display_str}</div>
+                    <div style="font-size: 11px; opacity: 0.8; margin-bottom: 3px; color: rgba(255,255,255,0.8) !important;">⏱️ 刷题用时</div>
+                    <div style="font-size: 16px; font-weight: 700; color: #ffffff !important;">{time_display_str}</div>
                 </div>
                 <div style="background: rgba(255, 255, 255, 0.1); padding: 12px; border-radius: 12px; text-align: center; border: 1px solid rgba(255,255,255,0.05);">
-                    <div style="font-size: 11px; opacity: 0.8; margin-bottom: 3px;">🎯 本次胜率</div>
-                    <div style="font-size: 16px; font-weight: 700; color: #10b981;">{final_accuracy}%</div>
+                    <div style="font-size: 11px; opacity: 0.8; margin-bottom: 3px; color: rgba(255,255,255,0.8) !important;">🎯 本次胜率</div>
+                    <div style="font-size: 16px; font-weight: 700; color: #10b981 !important;">{final_accuracy}%</div>
                 </div>
                 <div style="background: rgba(255, 255, 255, 0.1); padding: 12px; border-radius: 12px; text-align: center; border: 1px solid rgba(255,255,255,0.05);">
-                    <div style="font-size: 11px; opacity: 0.8; margin-bottom: 3px;">✅ 答对题数</div>
-                    <div style="font-size: 16px; font-weight: 700; color: #34d399;">{st.session_state.score} 题</div>
+                    <div style="font-size: 11px; opacity: 0.8; margin-bottom: 3px; color: rgba(255,255,255,0.8) !important;">✅ 答对题数</div>
+                    <div style="font-size: 16px; font-weight: 700; color: #34d399 !important;">{st.session_state.score} 题</div>
                 </div>
                 <div style="background: rgba(255, 255, 255, 0.1); padding: 12px; border-radius: 12px; text-align: center; border: 1px solid rgba(255,255,255,0.05);">
-                    <div style="font-size: 11px; opacity: 0.8; margin-bottom: 3px;">❌ 答错题数</div>
-                    <div style="font-size: 16px; font-weight: 700; color: #f87171;">{len(st.session_state.wrong_questions)} 题</div>
+                    <div style="font-size: 11px; opacity: 0.8; margin-bottom: 3px; color: rgba(255,255,255,0.8) !important;">❌ 答错题数</div>
+                    <div style="font-size: 16px; font-weight: 700; color: #f87171 !important;">{len(st.session_state.wrong_questions)} 题</div>
                 </div>
             </div>
-            <div style="border-top: 1px solid rgba(255, 255, 255, 0.15); padding-top: 16px; font-size: 13px; font-weight: 700; color: #f3f4f6; letter-spacing: 0.5px;">
+            <div style="border-top: 1px solid rgba(255, 255, 255, 0.15); padding-top: 16px; font-size: 13px; font-weight: 700; color: #f3f4f6 !important; letter-spacing: 0.5px;">
                 {grade_comment}
             </div>
         </div>
