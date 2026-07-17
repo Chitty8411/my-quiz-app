@@ -164,9 +164,9 @@ st.markdown("""
         transform: scale(0.97) !important;
     }
     
-    /* 【核心突破】彻底粉碎 Streamlit 所有子级容器的 min-width 限制，使其在手机上与顶部卡片完美对齐并排 */
-    div[data-testid="stHorizontalBlock"],
-    div[data-testid="stHorizontalBlock"] > div {
+    /* 【神级修复】彻底摒弃属性选择器，直接使用原生底层类对横向列布局执行绝对锁定 */
+    .stHorizontalBlock,
+    .stHorizontalBlock > div {
         display: flex !important;
         flex-direction: row !important;
         flex-wrap: nowrap !important;
@@ -174,28 +174,30 @@ st.markdown("""
         width: 100% !important;
     }
     
-    div[data-testid="stHorizontalBlock"] [data-testid="column"] {
+    /* 对所有列宽度进行强效对半分，强力挤出屏幕内空间 */
+    .stColumn {
         width: calc(50% - 4px) !important; /* 精准分摊，50% 减去 4px 间距 */
         flex: 1 1 0% !important; /* 强制平分，不允许任何溢出 */
         min-width: 0 !important;  /* 击碎任何原生 250px 限制 */
         max-width: calc(50% - 4px) !important;
     }
     
-    /* 深度递归击碎任何深层包裹 div 的宽度限制，从而实现按钮右侧完美贴齐屏幕右边框 */
-    div[data-testid="stHorizontalBlock"] [data-testid="column"] div {
+    /* 深度递归级联：锁定列内部任何深层包裹 div 和元素，彻底消除撑开宽度的可能 */
+    .stColumn div,
+    .stColumn * {
         min-width: 0 !important;
         max-width: 100% !important;
         width: 100% !important;
     }
 
-    /* 【终极奥义】针对并行小按钮内部的 padding 和文字换行进行深度控制，打碎 white-space: nowrap */
-    div[data-testid="stHorizontalBlock"] button {
+    /* 针对并行小按钮内部的 padding 和文字换行进行深度控制，打碎 white-space: nowrap */
+    .stColumn button {
         padding-left: 2px !important;
         padding-right: 2px !important;
     }
 
-    div[data-testid="stHorizontalBlock"] button p,
-    div[data-testid="stHorizontalBlock"] button span {
+    .stColumn button p,
+    .stColumn button span {
         font-size: 11px !important; /* 降低字号，确保在超窄屏下也能塞得进 */
         white-space: normal !important; /* 允许在极窄屏幕下进行优雅换行，绝不允许挤压容器宽度 */
         line-height: 1.1 !important;
@@ -372,6 +374,7 @@ if st.session_state.current_index < len(st.session_state.order):
 
     st.markdown("<hr style='border-top:1px solid #e2e8f0; margin: 8px 0;'/ >", unsafe_allow_html=True)
     
+    # 调用原生 st.columns(2) 模块，由我们重构的 CSS 直接强制接管并 50/50 锁死对齐
     col_shuffle1, col_shuffle2 = st.columns(2)
     with col_shuffle1:
         if st.button("🔀 打乱题库顺序", type="secondary", use_container_width=True):
