@@ -247,14 +247,18 @@ if st.session_state.current_index < len(st.session_state.order):
     orig_options_list = []
     for letter in ['A', 'B', 'C', 'D', 'E']:
         opt_text = row.get(f'选项{letter}', '')
-        if opt_text:
-            orig_options_list.append((letter, opt_text))
+        if pd.notna(opt_text) and str(opt_text).strip() != "":
+            orig_options_list.append((letter, str(opt_text).strip()))
             
     # 如果开启了选项乱序，且还未建立当前题目的缓存，则执行洗牌
     if real_idx not in st.session_state.shuffled_options_cache:
         if st.session_state.shuffle_options:
             shuffled_list = list(orig_options_list)
-            random.shuffle(shuffled_list)
+            # 保证洗牌后顺序与原顺序不完全一致以保证确实打乱了选项
+            attempts = 0
+            while len(orig_options_list) > 1 and shuffled_list == orig_options_list and attempts < 10:
+                random.shuffle(shuffled_list)
+                attempts += 1
             st.session_state.shuffled_options_cache[real_idx] = shuffled_list
         else:
             st.session_state.shuffled_options_cache[real_idx] = orig_options_list
@@ -338,7 +342,7 @@ if st.session_state.current_index < len(st.session_state.order):
 
     st.markdown("<hr style='border-top:1px solid #e2e8f0; margin: 8px 0;'/ >", unsafe_allow_html=True)
     
-    # 并列放置“打乱题库顺序”和“打乱题库和选项”
+    # 并列放置“打乱题库顺序”和“打乱题库和选项”（使用相同紫色格式）
     col_shuffle1, col_shuffle2 = st.columns(2)
     with col_shuffle1:
         if st.button("🔀 打乱题库顺序", type="secondary"):
