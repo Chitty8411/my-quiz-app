@@ -506,6 +506,35 @@ else:
     """, unsafe_allow_html=True)
     
     if st.session_state.wrong_questions:
+        # 错题回顾上方的完美并排重新挑战按钮（现在挪到战报下方，错题上方）
+        col_w1, col_w2 = st.columns(2)
+        with col_w1:
+            if st.button("🔥 针对错题重新挑战", type="primary", use_container_width=True):
+                st.session_state.order = [item['index'] for item in st.session_state.wrong_questions]
+                st.session_state.current_index = 0
+                st.session_state.submitted = False
+                st.session_state.score = 0
+                st.session_state.total_answered = 0
+                st.session_state.wrong_questions = [] 
+                st.session_state.shuffled_options_cache = {}
+                st.session_state.start_time = None
+                st.session_state.elapsed_time = 0
+                st.rerun()
+        with col_w2:
+            if st.button("🔄 重新挑战完整题库", type="primary", use_container_width=True):
+                st.session_state.order = list(range(len(df)))
+                st.session_state.current_index = 0
+                st.session_state.submitted = False
+                st.session_state.score = 0
+                st.session_state.total_answered = 0
+                st.session_state.wrong_questions = []
+                st.session_state.shuffled_options_cache = {}
+                st.session_state.start_time = None
+                st.session_state.elapsed_time = 0
+                st.rerun()
+
+        st.markdown("<hr style='border-top:1px solid #e2e8f0; margin: 12px 0;'/ >", unsafe_allow_html=True)
+
         st.markdown(f"### ❌ 本轮错题集回顾 ({len(st.session_state.wrong_questions)} 题)")
         st.caption("以下是您刚刚答错的题目，请仔细看答案对比进行复习：")
         
@@ -535,32 +564,6 @@ else:
             
         st.markdown("<br/>", unsafe_allow_html=True)
         
-        # 错题回顾底部的完美并排重试按钮
-        col_w1, col_w2 = st.columns(2)
-        with col_w1:
-            if st.button("🔥 针对错题重新挑战", type="primary", use_container_width=True):
-                st.session_state.order = [item['index'] for item in st.session_state.wrong_questions]
-                st.session_state.current_index = 0
-                st.session_state.submitted = False
-                st.session_state.score = 0
-                st.session_state.total_answered = 0
-                st.session_state.wrong_questions = [] 
-                st.session_state.shuffled_options_cache = {}
-                st.session_state.start_time = None
-                st.session_state.elapsed_time = 0
-                st.rerun()
-        with col_w2:
-            if st.button("🔄 重新挑战完整题库", type="primary", use_container_width=True):
-                st.session_state.order = list(range(len(df)))
-                st.session_state.current_index = 0
-                st.session_state.submitted = False
-                st.session_state.score = 0
-                st.session_state.total_answered = 0
-                st.session_state.wrong_questions = []
-                st.session_state.shuffled_options_cache = {}
-                st.session_state.start_time = None
-                st.session_state.elapsed_time = 0
-                st.rerun()
     else:
         st.markdown("""
             <div style="background-color: #f0fdf4; border: 1px solid #bbf7d0; padding: 25px; border-radius: 16px; text-align: center; margin-top: 20px; box-shadow: 0 4px 12px rgba(16, 185, 129, 0.08);">
