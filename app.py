@@ -14,6 +14,13 @@ st.set_page_config(
 
 st.markdown("""
     <style>
+    /* 彻底隐藏 Streamlit 默认头部工具栏，回收顶部状态栏高度，防止遮挡 */
+    header[data-testid="stHeader"] {
+        display: none !important;
+        height: 0px !important;
+        visibility: hidden !important;
+    }
+    
     /* 全局背景色调 */
     .stApp {
         background-color: #f8fafc;
@@ -26,7 +33,7 @@ st.markdown("""
     
     /* 隐藏顶部白边，降低内边距，挤压出首屏空间 */
     .block-container {
-        padding-top: 0.5rem !important;
+        padding-top: 0px !important;
         padding-bottom: 0.5rem !important;
         padding-left: 0.75rem !important;
         padding-right: 0.75rem !important;
@@ -469,30 +476,30 @@ else:
     else:
         grade_comment = "💪 再接再厉！坚持不懈，错题集是你的通关秘籍！"
 
-    # 精美渐变结业战报 HTML 卡片展示在最上方 - 整体下移并高度扩充防遮挡
+    # 精美渐变结业战报 HTML 卡片展示在最上方 - 极致贴顶并缩紧内边距
     st.markdown(f"""
-        <div style="background: linear-gradient(135deg, #0f2b5c 0%, #1e40af 100%); color: white; padding: 35px 18px; border-radius: 16px; box-shadow: 0 10px 25px rgba(30, 64, 175, 0.15); margin-top: 35px; margin-bottom: 20px; text-align: center;">
-            <div style="font-size: 24px; font-weight: 800; margin-bottom: 4px; letter-spacing: 0.5px;">🏆 泰圣奇刷题结业战报</div>
-            <div style="font-size: 13px; opacity: 0.8; margin-bottom: 20px;">恭喜您完成了本次的全部挑战！</div>
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px;">
-                <div style="background: rgba(255, 255, 255, 0.1); padding: 12px; border-radius: 12px; text-align: center; border: 1px solid rgba(255,255,255,0.05);">
+        <div style="background: linear-gradient(135deg, #0f2b5c 0%, #1e40af 100%); color: white; padding: 20px 14px; border-radius: 16px; box-shadow: 0 10px 25px rgba(30, 64, 175, 0.15); margin-top: 8px; margin-bottom: 16px; text-align: center;">
+            <div style="font-size: 22px; font-weight: 800; margin-bottom: 4px; letter-spacing: 0.5px;">🏆 泰圣奇刷题结业战报</div>
+            <div style="font-size: 12px; opacity: 0.8; margin-bottom: 14px;">恭喜您完成了本次的全部挑战！</div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 14px;">
+                <div style="background: rgba(255, 255, 255, 0.1); padding: 10px; border-radius: 12px; text-align: center; border: 1px solid rgba(255,255,255,0.05);">
                     <div style="font-size: 11px; opacity: 0.8; margin-bottom: 3px;">⏱️ 刷题用时</div>
-                    <div style="font-size: 17px; font-weight: 700; color: #ffffff;">{time_display_str}</div>
+                    <div style="font-size: 16px; font-weight: 700; color: #ffffff;">{time_display_str}</div>
                 </div>
-                <div style="background: rgba(255, 255, 255, 0.1); padding: 12px; border-radius: 12px; text-align: center; border: 1px solid rgba(255,255,255,0.05);">
+                <div style="background: rgba(255, 255, 255, 0.1); padding: 10px; border-radius: 12px; text-align: center; border: 1px solid rgba(255,255,255,0.05);">
                     <div style="font-size: 11px; opacity: 0.8; margin-bottom: 3px;">🎯 本次胜率</div>
-                    <div style="font-size: 17px; font-weight: 700; color: #10b981;">{final_accuracy}%</div>
+                    <div style="font-size: 16px; font-weight: 700; color: #10b981;">{final_accuracy}%</div>
                 </div>
-                <div style="background: rgba(255, 255, 255, 0.1); padding: 12px; border-radius: 12px; text-align: center; border: 1px solid rgba(255,255,255,0.05);">
+                <div style="background: rgba(255, 255, 255, 0.1); padding: 10px; border-radius: 12px; text-align: center; border: 1px solid rgba(255,255,255,0.05);">
                     <div style="font-size: 11px; opacity: 0.8; margin-bottom: 3px;">✅ 答对题数</div>
-                    <div style="font-size: 17px; font-weight: 700; color: #34d399;">{st.session_state.score} 题</div>
+                    <div style="font-size: 16px; font-weight: 700; color: #34d399;">{st.session_state.score} 题</div>
                 </div>
-                <div style="background: rgba(255, 255, 255, 0.1); padding: 12px; border-radius: 12px; text-align: center; border: 1px solid rgba(255,255,255,0.05);">
+                <div style="background: rgba(255, 255, 255, 0.1); padding: 10px; border-radius: 12px; text-align: center; border: 1px solid rgba(255,255,255,0.05);">
                     <div style="font-size: 11px; opacity: 0.8; margin-bottom: 3px;">❌ 答错题数</div>
-                    <div style="font-size: 17px; font-weight: 700; color: #f87171;">{len(st.session_state.wrong_questions)} 题</div>
+                    <div style="font-size: 16px; font-weight: 700; color: #f87171;">{len(st.session_state.wrong_questions)} 题</div>
                 </div>
             </div>
-            <div style="border-top: 1px solid rgba(255, 255, 255, 0.15); padding-top: 14px; font-size: 14px; font-weight: 700; color: #f3f4f6; letter-spacing: 0.5px;">
+            <div style="border-top: 1px solid rgba(255, 255, 255, 0.15); padding-top: 12px; font-size: 13px; font-weight: 700; color: #f3f4f6; letter-spacing: 0.5px;">
                 {grade_comment}
             </div>
         </div>
