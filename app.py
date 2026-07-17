@@ -4,7 +4,7 @@ import random
 import time
 import streamlit.components.v1 as components
 
-# 针对手机屏幕进行终极美化配置，强制折叠侧边栏
+# 针对手机屏幕进行终极美化配置，强制折叠侧边栏并设定标题
 st.set_page_config(
     page_title="泰圣奇知识刷题系统", 
     page_icon="📱", 
@@ -12,39 +12,32 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
+# ========================================================
+# 【极速渗透锁定浅色主题】彻底屏蔽系统深色模式（Dark Mode）对文字、选项、背景的任何反色干扰
+# ========================================================
 st.markdown("""
     <style>
-    /* 彻底隐藏 Streamlit 默认头部工具栏，回收顶部状态栏高度，实现 100% 满屏展示 */
+    /* 彻底锁定底层系统变量，使其在手机切换深色模式时仍强制指向亮白色主题 */
+    :root {
+        --primary-color: #1a52a5 !important;
+        --background-color: #f8fafc !important;
+        --secondary-background-color: #ffffff !important;
+        --text-color: #1e293b !important;
+        color-scheme: light !important;
+    }
+    
+    /* 彻底隐藏 Streamlit 默认头部工具栏，回收顶端高度 */
     header[data-testid="stHeader"] {
         display: none !important;
         height: 0px !important;
         visibility: hidden !important;
     }
     
-    /* 全局背景色调 */
-    .stApp {
-        background-color: #f8fafc !important;
-    }
-    
-    /* 强力压缩 Streamlit 容器内部小部件的纵向默认间距，确保一屏展示 */
-    [data-testid="stVerticalBlock"] > div {
-        gap: 0.4rem !important;
-    }
-    
-    /* 隐藏顶部白边，降低内边距，挤压出首屏空间 */
-    .block-container {
-        padding-top: 0px !important;
-        padding-bottom: 0.5rem !important;
-        padding-left: 0.75rem !important;
-        padding-right: 0.75rem !important;
-    }
-    
-    /* ======================================================== */
-    /* 【强效锁定永久浅色主题】完全屏蔽系统深色模式（Dark Mode）的反色干扰 */
-    /* ======================================================== */
+    /* 强力锁定浅色模式：覆盖手机系统深色主题样式拦截 */
     @media (prefers-color-scheme: dark) {
-        .stApp {
+        html, body, [data-testid="stAppViewContainer"], .stApp {
             background-color: #f8fafc !important;
+            color: #1e293b !important;
         }
         h1, h2, h3, h4, h5, h6, p, span, label, li, strong, div, .stMarkdown, .stCaption {
             color: #1e293b !important;
@@ -70,6 +63,42 @@ st.markdown("""
             color: #1e293b !important;
             background-color: #ffffff !important;
         }
+    }
+    
+    /* 解决手机端由于深色模式自动反色导致的复选框和单选框变黑（黑色实心小方块）的问题 */
+    div[data-baseweb="checkbox"] > div:first-child,
+    div[data-baseweb="radio"] > div:first-child {
+        background-color: #ffffff !important;
+        border-color: #cbd5e1 !important;
+    }
+    /* 单选/复选被选中时，强制保持活力蓝色，防止在深色模式下变成灰黑色 */
+    div[data-baseweb="checkbox"] input:checked + div,
+    div[data-baseweb="radio"] input:checked + div {
+        background-color: #1a52a5 !important;
+        border-color: #1a52a5 !important;
+    }
+    div[data-baseweb="checkbox"] [checked] ~ div,
+    div[data-baseweb="radio"] [checked] ~ div {
+        background-color: #1a52a5 !important;
+        border-color: #1a52a5 !important;
+    }
+
+    /* 全局背景色调 */
+    .stApp {
+        background-color: #f8fafc !important;
+    }
+    
+    /* 强力压缩 Streamlit 容器内部小部件的纵向默认间距，确保一屏展示 */
+    [data-testid="stVerticalBlock"] > div {
+        gap: 0.4rem !important;
+    }
+    
+    /* 隐藏顶部白边，降低内边距，挤压出首屏空间 */
+    .block-container {
+        padding-top: 0px !important;
+        padding-bottom: 0.5rem !important;
+        padding-left: 0.75rem !important;
+        padding-right: 0.75rem !important;
     }
     
     /* 顶部渐变状态卡片 - 缩减内边距与高度 */
@@ -251,33 +280,6 @@ st.markdown("""
     /* 进度条精细化 */
     .stProgress > div > div > div > div {
         background-color: #2563eb !important;
-    }
-
-    /* ======================================================== */
-    /* 针对结业结算页：个性化定制并排按钮色彩，达成极佳视觉指示 */
-    /* ======================================================== */
-    /* 1. 针对错题重新挑战：高贵活力蓝色渐变 (Classic Radiant Blue) */
-    .stHorizontalBlock > div:nth-child(1) button[kind="primary"] {
-        background: linear-gradient(90deg, #1a52a5 0%, #2563eb 100%) !important;
-        box-shadow: 0 4px 14px rgba(37, 99, 235, 0.25) !important;
-        color: white !important;
-        border: none !important;
-    }
-    .stHorizontalBlock > div:nth-child(1) button[kind="primary"]:active {
-        transform: scale(0.97) !important;
-        box-shadow: 0 2px 6px rgba(37, 99, 235, 0.15) !important;
-    }
-
-    /* 2. 重新挑战完整题库：高贵活力蓝色渐变 (Classic Radiant Blue) */
-    .stHorizontalBlock > div:nth-child(2) button[kind="primary"] {
-        background: linear-gradient(90deg, #1a52a5 0%, #2563eb 100%) !important;
-        box-shadow: 0 4px 14px rgba(37, 99, 235, 0.25) !important;
-        color: white !important;
-        border: none !important;
-    }
-    .stHorizontalBlock > div:nth-child(2) button[kind="primary"]:active {
-        transform: scale(0.97) !important;
-        box-shadow: 0 2px 6px rgba(37, 99, 235, 0.15) !important;
     }
     </style>
 """, unsafe_allow_html=True)
