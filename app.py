@@ -141,7 +141,7 @@ st.markdown("""
         box-shadow: 0 2px 6px rgba(37, 99, 235, 0.15) !important;
     }
     
-    /* 底部辅助小按钮 (打乱题库顺序等按钮) - 设定精美高档的“罗兰紫”配色 */
+    /* 底部辅助小按钮 (打乱题库等按钮) - 设定精美高档的“罗兰紫”配色 */
     .stButton>button[kind="secondary"] {
         background: linear-gradient(90deg, #7c3aed 0%, #8b5cf6 100%) !important;
         color: white !important;
@@ -167,9 +167,10 @@ st.markdown("""
     /* 强制在移动端 st.columns 保持并排，永不折行换位 */
     div[data-testid="stHorizontalBlock"] {
         flex-direction: row !important;
+        flex-wrap: nowrap !important;
         gap: 0.5rem !important;
     }
-    div[data-testid="stHorizontalBlock"] > div[data-testid="column"] {
+    div[data-testid="stHorizontalBlock"] [data-testid="column"] {
         width: calc(50% - 0.25rem) !important;
         flex: 1 1 calc(50% - 0.25rem) !important;
         min-width: calc(50% - 0.25rem) !important;
@@ -342,7 +343,6 @@ if st.session_state.current_index < len(st.session_state.order):
 
     st.markdown("<hr style='border-top:1px solid #e2e8f0; margin: 8px 0;'/ >", unsafe_allow_html=True)
     
-    # 并列放置“打乱题库顺序”和“打乱题库和选项”（使用相同紫色格式）
     col_shuffle1, col_shuffle2 = st.columns(2)
     with col_shuffle1:
         if st.button("🔀 打乱题库顺序", type="secondary"):
