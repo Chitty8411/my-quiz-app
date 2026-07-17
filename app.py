@@ -2,6 +2,7 @@ import streamlit as st
 import pandas as pd
 import random
 import time
+import streamlit.components.v1 as components
 
 # 针对手机屏幕进行终极美化配置，强制折叠侧边栏
 st.set_page_config(
@@ -123,22 +124,22 @@ st.markdown("""
         font-weight: 500 !important;
     }
     
-    /* 提交答案和重置进度核心按钮 - 高度压缩至 44px 更适合拇指点击，蓝色渐变 */
+    /* 提交答案和重置进度核心按钮 - 高度强制放大至 52px 以实现极致舒适的拇指点按体验 */
     .stButton>button[kind="primary"] {
         width: 100% !important;
-        height: 44px !important;
+        height: 52px !important;
         background: linear-gradient(90deg, #1a52a5 0%, #2563eb 100%) !important;
         color: white !important;
-        font-size: 14px !important;
-        font-weight: 600 !important;
-        border-radius: 10px !important;
+        font-size: 16px !important;
+        font-weight: 700 !important;
+        border-radius: 12px !important;
         border: none !important;
-        box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2) !important;
+        box-shadow: 0 4px 14px rgba(37, 99, 235, 0.25) !important;
         transition: all 0.2s ease !important;
     }
     
     .stButton>button[kind="primary"]:active {
-        transform: scale(0.98) !important;
+        transform: scale(0.97) !important;
         box-shadow: 0 2px 6px rgba(37, 99, 235, 0.15) !important;
     }
     
@@ -433,6 +434,18 @@ if st.session_state.current_index < len(st.session_state.order):
 else:
     st.balloons()
     
+    # 注入强制回到顶部 JavaScript，保证一进入结束页面直接从顶部（战报）展示
+    components.html("""
+        <script>
+            if (window.parent) {
+                window.parent.scrollTo({
+                    top: 0,
+                    behavior: 'smooth'
+                });
+            }
+        </script>
+    """, height=0, width=0)
+    
     # 格式化用时：分、秒展示
     total_seconds = int(st.session_state.elapsed_time)
     if total_seconds < 60:
@@ -456,9 +469,9 @@ else:
     else:
         grade_comment = "💪 再接再厉！坚持不懈，错题集是你的通关秘籍！"
 
-    # 精美渐变结业战报 HTML 卡片展示在最上方
+    # 精美渐变结业战报 HTML 卡片展示在最上方 - 整体下移并高度扩充防遮挡
     st.markdown(f"""
-        <div style="background: linear-gradient(135deg, #0f2b5c 0%, #1e40af 100%); color: white; padding: 22px 18px; border-radius: 16px; box-shadow: 0 10px 25px rgba(30, 64, 175, 0.15); margin-bottom: 20px; text-align: center;">
+        <div style="background: linear-gradient(135deg, #0f2b5c 0%, #1e40af 100%); color: white; padding: 35px 18px; border-radius: 16px; box-shadow: 0 10px 25px rgba(30, 64, 175, 0.15); margin-top: 35px; margin-bottom: 20px; text-align: center;">
             <div style="font-size: 24px; font-weight: 800; margin-bottom: 4px; letter-spacing: 0.5px;">🏆 泰圣奇刷题结业战报</div>
             <div style="font-size: 13px; opacity: 0.8; margin-bottom: 20px;">恭喜您完成了本次的全部挑战！</div>
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px;">
