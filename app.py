@@ -1,6 +1,7 @@
 import streamlit as st
 import pandas as pd
 import random
+import time
 
 # 针对手机屏幕进行终极美化配置，强制折叠侧边栏
 st.set_page_config(
@@ -128,7 +129,7 @@ st.markdown("""
         height: 44px !important;
         background: linear-gradient(90deg, #1a52a5 0%, #2563eb 100%) !important;
         color: white !important;
-        font-size: 15px !important;
+        font-size: 14px !important;
         font-weight: 600 !important;
         border-radius: 10px !important;
         border: none !important;
@@ -164,25 +165,25 @@ st.markdown("""
         transform: scale(0.97) !important;
     }
     
-    /* 【神级修复】彻底摒弃属性选择器，直接使用原生底层类对横向列布局执行绝对锁定 */
+    /* 【原生类霸道锁定】彻底解禁 Flex 行换行，确保手机端两个列永远在一条横线上并列摆放 */
     .stHorizontalBlock,
     .stHorizontalBlock > div {
         display: flex !important;
         flex-direction: row !important;
         flex-wrap: nowrap !important;
-        gap: 8px !important; /* 精准对齐上方 flex-gap 的 8px */
+        gap: 8px !important; /* 对齐上方卡片的两端 */
         width: 100% !important;
     }
     
-    /* 对所有列宽度进行强效对半分，强力挤出屏幕内空间 */
+    /* 强制解除 250px 限制，完美50/50对半分 */
     .stColumn {
-        width: calc(50% - 4px) !important; /* 精准分摊，50% 减去 4px 间距 */
-        flex: 1 1 0% !important; /* 强制平分，不允许任何溢出 */
-        min-width: 0 !important;  /* 击碎任何原生 250px 限制 */
+        width: calc(50% - 4px) !important;
+        flex: 1 1 0% !important;
+        min-width: 0 !important;
         max-width: calc(50% - 4px) !important;
     }
     
-    /* 深度递归级联：锁定列内部任何深层包裹 div 和元素，彻底消除撑开宽度的可能 */
+    /* 深度穿透列内的多重嵌套 React 包装元素，全部设为自适应 */
     .stColumn div,
     .stColumn * {
         min-width: 0 !important;
@@ -190,7 +191,7 @@ st.markdown("""
         width: 100% !important;
     }
 
-    /* 针对并行小按钮内部的 padding 和文字换行进行深度控制，打碎 white-space: nowrap */
+    /* 优化内边距使 14px 字体两行能完美塞入 */
     .stColumn button {
         padding-left: 2px !important;
         padding-right: 2px !important;
@@ -198,10 +199,10 @@ st.markdown("""
 
     .stColumn button p,
     .stColumn button span {
-        font-size: 14px !important; /* 【已修复】字号完美提升至 14px，与大按钮高度和谐统一 */
-        white-space: normal !important; /* 允许在极窄屏幕下进行优雅换行，绝不允许挤压容器宽度 */
-        line-height: 1.1 !important;
-        letter-spacing: -0.6px !important; /* 稍微压缩字间距 */
+        font-size: 14px !important; /* 【完美对齐】完美恢复为与主按钮一致的标准字号 */
+        white-space: normal !important; /* 在超窄屏幕上优雅折行，绝不向两边挤爆出屏外 */
+        line-height: 1.15 !important;
+        letter-spacing: -0.5px !important;
         text-align: center !important;
         display: block !important;
     }
@@ -237,7 +238,13 @@ if 'order' not in st.session_state:
 if 'wrong_questions' not in st.session_state:
     st.session_state.wrong_questions = []
 
-# 用于选项打乱的高级状态缓存机制，避免刷新时选项排序乱跳
+# 新增计时器状态控制
+if 'start_time' not in st.session_state:
+    st.session_state.start_time = None
+if 'elapsed_time' not in st.session_state:
+    st.session_state.elapsed_time = 0
+
+# 用于选项打乱的高级状态缓存机制
 if 'shuffle_options' not in st.session_state:
     st.session_state.shuffle_options = False
 if 'shuffled_options_cache' not in st.session_state:
@@ -340,6 +347,10 @@ if st.session_state.current_index < len(st.session_state.order):
             if not user_answer_orig:
                 st.warning("⚠️ 请先勾选或选择您的答案！")
             else:
+                # 记录开始计时（用户提交第一题时正式开始）
+                if st.session_state.start_time is None:
+                    st.session_state.start_time = time.time()
+
                 st.session_state.submitted = True
                 st.session_state.total_answered += 1
                 if user_answer_orig == correct_answer:
@@ -351,6 +362,13 @@ if st.session_state.current_index < len(st.session_state.order):
                             'user_answer': user_answer_orig,
                             'correct_answer': correct_answer
                         })
+                
+                # 如果是最后一题被确认提交，立即结算最终用时
+                if st.session_state.current_index + 1 >= len(st.session_state.order):
+                    if st.session_state.start_time is not None:
+                        st.session_state.elapsed_time = time.time() - st.session_state.start_time
+                    else:
+                        st.session_state.elapsed_time = 0
                 st.rerun()
     else:
         if user_answer_orig == correct_answer:
@@ -374,7 +392,7 @@ if st.session_state.current_index < len(st.session_state.order):
 
     st.markdown("<hr style='border-top:1px solid #e2e8f0; margin: 8px 0;'/ >", unsafe_allow_html=True)
     
-    # 调用原生 st.columns(2) 模块，由我们重构的 CSS 直接强制接管并 50/50 锁死对齐
+    # 完美双子星紫色打乱按钮并列布局
     col_shuffle1, col_shuffle2 = st.columns(2)
     with col_shuffle1:
         if st.button("🔀 打乱题库顺序", type="secondary", use_container_width=True):
@@ -384,6 +402,8 @@ if st.session_state.current_index < len(st.session_state.order):
             st.session_state.wrong_questions = [] 
             st.session_state.shuffle_options = False
             st.session_state.shuffled_options_cache = {}
+            st.session_state.start_time = None # 重置计时
+            st.session_state.elapsed_time = 0
             st.rerun()
     with col_shuffle2:
         if st.button("🔥 打乱题库和选项", type="secondary", use_container_width=True):
@@ -393,9 +413,11 @@ if st.session_state.current_index < len(st.session_state.order):
             st.session_state.wrong_questions = [] 
             st.session_state.shuffle_options = True
             st.session_state.shuffled_options_cache = {}
+            st.session_state.start_time = None # 重置计时
+            st.session_state.elapsed_time = 0
             st.rerun()
         
-    # 重置进度按钮（高档蓝色渐变，与提交按钮高度统一）
+    # 重置进度按钮（高档蓝色渐变，与确认提交按钮风格统一）
     if st.button("🔄 重置进度从头开始", type="primary", use_container_width=True):
         st.session_state.current_index = 0
         st.session_state.submitted = False
@@ -404,11 +426,64 @@ if st.session_state.current_index < len(st.session_state.order):
         st.session_state.wrong_questions = [] 
         st.session_state.shuffle_options = False
         st.session_state.shuffled_options_cache = {}
+        st.session_state.start_time = None # 重置计时
+        st.session_state.elapsed_time = 0
         st.rerun()
 
 else:
     st.balloons()
-    st.success(f"🏆 太了不起了！您已经完成了本次全部 {len(st.session_state.order)} 道题目的挑战！")
+    
+    # 格式化用时：分、秒展示
+    total_seconds = int(st.session_state.elapsed_time)
+    if total_seconds < 60:
+        time_display_str = f"{total_seconds} 秒"
+    else:
+        minutes = total_seconds // 60
+        seconds = total_seconds % 60
+        time_display_str = f"{minutes} 分 {seconds} 秒"
+        
+    final_accuracy = int((st.session_state.score / len(st.session_state.order) * 100)) if len(st.session_state.order) > 0 else 0
+    
+    # 智能等级评价
+    if final_accuracy == 100:
+        grade_comment = "🌟 超凡大师！神级表现，完全无懈可击！"
+    elif final_accuracy >= 90:
+        grade_comment = "🔥 荣耀学霸！底子极其扎实，傲视群雄！"
+    elif final_accuracy >= 80:
+        grade_comment = "⚡ 渐入佳境！实力在线，稍加复习即臻完美！"
+    elif final_accuracy >= 60:
+        grade_comment = "📈 稳步前行！多看错题总结，加油突击！"
+    else:
+        grade_comment = "💪 再接再厉！坚持不懈，错题集是你的通关秘籍！"
+
+    # 精美渐变结业战报 HTML 卡片展示在最上方
+    st.markdown(f"""
+        <div style="background: linear-gradient(135deg, #0f2b5c 0%, #1e40af 100%); color: white; padding: 22px 18px; border-radius: 16px; box-shadow: 0 10px 25px rgba(30, 64, 175, 0.15); margin-bottom: 20px; text-align: center;">
+            <div style="font-size: 24px; font-weight: 800; margin-bottom: 4px; letter-spacing: 0.5px;">🏆 泰圣奇刷题结业战报</div>
+            <div style="font-size: 13px; opacity: 0.8; margin-bottom: 20px;">恭喜您完成了本次的全部挑战！</div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px;">
+                <div style="background: rgba(255, 255, 255, 0.1); padding: 12px; border-radius: 12px; text-align: center; border: 1px solid rgba(255,255,255,0.05);">
+                    <div style="font-size: 11px; opacity: 0.8; margin-bottom: 3px;">⏱️ 刷题用时</div>
+                    <div style="font-size: 17px; font-weight: 700; color: #ffffff;">{time_display_str}</div>
+                </div>
+                <div style="background: rgba(255, 255, 255, 0.1); padding: 12px; border-radius: 12px; text-align: center; border: 1px solid rgba(255,255,255,0.05);">
+                    <div style="font-size: 11px; opacity: 0.8; margin-bottom: 3px;">🎯 本次胜率</div>
+                    <div style="font-size: 17px; font-weight: 700; color: #10b981;">{final_accuracy}%</div>
+                </div>
+                <div style="background: rgba(255, 255, 255, 0.1); padding: 12px; border-radius: 12px; text-align: center; border: 1px solid rgba(255,255,255,0.05);">
+                    <div style="font-size: 11px; opacity: 0.8; margin-bottom: 3px;">✅ 答对题数</div>
+                    <div style="font-size: 17px; font-weight: 700; color: #34d399;">{st.session_state.score} 题</div>
+                </div>
+                <div style="background: rgba(255, 255, 255, 0.1); padding: 12px; border-radius: 12px; text-align: center; border: 1px solid rgba(255,255,255,0.05);">
+                    <div style="font-size: 11px; opacity: 0.8; margin-bottom: 3px;">❌ 答错题数</div>
+                    <div style="font-size: 17px; font-weight: 700; color: #f87171;">{len(st.session_state.wrong_questions)} 题</div>
+                </div>
+            </div>
+            <div style="border-top: 1px solid rgba(255, 255, 255, 0.15); padding-top: 14px; font-size: 14px; font-weight: 700; color: #f3f4f6; letter-spacing: 0.5px;">
+                {grade_comment}
+            </div>
+        </div>
+    """, unsafe_allow_html=True)
     
     if st.session_state.wrong_questions:
         st.markdown(f"### ❌ 本轮错题集回顾 ({len(st.session_state.wrong_questions)} 题)")
@@ -439,6 +514,8 @@ else:
             """, unsafe_allow_html=True)
             
         st.markdown("<br/>", unsafe_allow_html=True)
+        
+        # 错题回顾底部的完美并排重试按钮
         col_w1, col_w2 = st.columns(2)
         with col_w1:
             if st.button("🔥 针对错题重新挑战", type="primary", use_container_width=True):
@@ -449,6 +526,8 @@ else:
                 st.session_state.total_answered = 0
                 st.session_state.wrong_questions = [] 
                 st.session_state.shuffled_options_cache = {}
+                st.session_state.start_time = None
+                st.session_state.elapsed_time = 0
                 st.rerun()
         with col_w2:
             if st.button("🔄 重新挑战完整题库", type="primary", use_container_width=True):
@@ -459,6 +538,8 @@ else:
                 st.session_state.total_answered = 0
                 st.session_state.wrong_questions = []
                 st.session_state.shuffled_options_cache = {}
+                st.session_state.start_time = None
+                st.session_state.elapsed_time = 0
                 st.rerun()
     else:
         st.markdown("""
@@ -477,4 +558,6 @@ else:
             st.session_state.total_answered = 0
             st.session_state.wrong_questions = []
             st.session_state.shuffled_options_cache = {}
+            st.session_state.start_time = None
+            st.session_state.elapsed_time = 0
             st.rerun()
