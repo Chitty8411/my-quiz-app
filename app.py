@@ -457,5 +457,3 @@ else:
             st.session_state.wrong_questions = []
             st.session_state.shuffled_options_cache = {}
             st.rerun()
-```
-`eof`
