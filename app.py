@@ -198,7 +198,7 @@ st.markdown("""
 
     .stColumn button p,
     .stColumn button span {
-        font-size: 11px !important; /* 降低字号，确保在超窄屏下也能塞得进 */
+        font-size: 14px !important; /* 【已修复】字号完美提升至 14px，与大按钮高度和谐统一 */
         white-space: normal !important; /* 允许在极窄屏幕下进行优雅换行，绝不允许挤压容器宽度 */
         line-height: 1.1 !important;
         letter-spacing: -0.6px !important; /* 稍微压缩字间距 */
