@@ -23,7 +23,7 @@ st.markdown("""
     
     /* 全局背景色调 */
     .stApp {
-        background-color: #f8fafc;
+        background-color: #f8fafc !important;
     }
     
     /* 强力压缩 Streamlit 容器内部小部件的纵向默认间距，确保一屏展示 */
@@ -37,6 +37,39 @@ st.markdown("""
         padding-bottom: 0.5rem !important;
         padding-left: 0.75rem !important;
         padding-right: 0.75rem !important;
+    }
+    
+    /* ======================================================== */
+    /* 【强效锁定永久浅色主题】完全屏蔽系统深色模式（Dark Mode）的反色干扰 */
+    /* ======================================================== */
+    @media (prefers-color-scheme: dark) {
+        .stApp {
+            background-color: #f8fafc !important;
+        }
+        h1, h2, h3, h4, h5, h6, p, span, label, li, strong, div, .stMarkdown, .stCaption {
+            color: #1e293b !important;
+        }
+        /* 选项卡片抗深色模式变黑 */
+        div[data-testid="stRadio"] label, div[data-testid="stCheckbox"] label {
+            background-color: #ffffff !important;
+            border-color: #e2e8f0 !important;
+        }
+        div[data-testid="stRadio"] label p, div[data-testid="stCheckbox"] label p {
+            color: #334155 !important;
+        }
+        /* 题干卡片、错题回顾卡片抗色变 */
+        .question-card, .wrong-question-card {
+            background-color: #ffffff !important;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02) !important;
+        }
+        .question-title {
+            color: #1e293b !important;
+        }
+        /* 强制覆盖Streamlit内置的多媒体组件反色 */
+        .stSelectbox div, .stTextInput input, .stTextArea textarea {
+            color: #1e293b !important;
+            background-color: #ffffff !important;
+        }
     }
     
     /* 顶部渐变状态卡片 - 缩减内边距与高度 */
