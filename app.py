@@ -192,27 +192,30 @@ if 'order' not in st.session_state:
 if 'wrong_questions' not in st.session_state:
     st.session_state.wrong_questions = [] # 用来存放错题
 
-# 5. 顶栏：高级渐变卡片式仪表盘
+# 用于处理选项乱序的新 Session State 变量
+if 'shuffle_options' not in st.session_state:
+    st.session_state.shuffle_options = False
+if 'shuffled_options_cache' not in st.session_state:
+    st.session_state.shuffled_options_cache = {}
+
+# 5. 顶栏：高级渐变卡片式仪表盘 (使用 Flexbox 强制在手机端并排，永不折行)
 current_num = st.session_state.current_index + 1
 accuracy = int((st.session_state.score / st.session_state.total_answered * 100)) if st.session_state.total_answered > 0 else 0
 
 # 只有没刷完时才显示顶栏状态卡
 if st.session_state.current_index < len(st.session_state.order):
-    col_dash1, col_dash2 = st.columns(2)
-    with col_dash1:
-        st.markdown(f"""
-            <div class="dashboard-card">
+    st.markdown(f"""
+        <div style="display: flex; gap: 8px; margin-bottom: 6px; width: 100%;">
+            <div class="dashboard-card" style="flex: 1; margin-bottom: 0;">
                 <div class="dashboard-title">📈 刷题进度</div>
-                <div class="dashboard-value">{current_num} <span style="font-size:12px; opacity:0.8;">/ {len(st.session_state.order)} 题</span></div>
+                <div class="dashboard-value" style="font-size: 18px !important;">{current_num} <span style="font-size:11px; opacity:0.8;">/ {len(st.session_state.order)} 题</span></div>
             </div>
-        """, unsafe_allow_html=True)
-    with col_dash2:
-        st.markdown(f"""
-            <div class="dashboard-card" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); box-shadow: 0 10px 20px rgba(16, 185, 129, 0.15);">
+            <div class="dashboard-card" style="flex: 1; margin-bottom: 0; background: linear-gradient(135deg, #10b981 0%, #059669 100%); box-shadow: 0 5px 10px rgba(16, 185, 129, 0.1);">
                 <div class="dashboard-title">🎯 当前胜率</div>
-                <div class="dashboard-value">{accuracy}% <span style="font-size:12px; opacity:0.8;">({st.session_state.score}对/{st.session_state.total_answered}做)</span></div>
+                <div class="dashboard-value" style="font-size: 18px !important;">{accuracy}% <span style="font-size:10px; opacity:0.8;">({st.session_state.score}对/{st.session_state.total_answered}做)</span></div>
             </div>
-        """, unsafe_allow_html=True)
+        </div>
+    """, unsafe_allow_html=True)
 
     # 进度条
     st.progress((st.session_state.current_index) / len(st.session_state.order) if len(st.session_state.order) > 0 else 0)
@@ -229,58 +232,91 @@ if st.session_state.current_index < len(st.session_state.order):
         </div>
     """, unsafe_allow_html=True)
     
-    options = {}
+    # 提取并解析本题原本的所有非空选项
+    orig_options_list = []
     for letter in ['A', 'B', 'C', 'D', 'E']:
         opt_text = row.get(f'选项{letter}', '')
         if opt_text:
-            options[letter] = f"{letter}. {opt_text}"
+            orig_options_list.append((letter, opt_text))
             
+    # 如果开启了选项乱序，且当前题目选项还没有生成过乱序缓存，则进行乱序处理
+    if real_idx not in st.session_state.shuffled_options_cache:
+        if st.session_state.shuffle_options:
+            shuffled_list = list(orig_options_list)
+            random.shuffle(shuffled_list)
+            st.session_state.shuffled_options_cache[real_idx] = shuffled_list
+        else:
+            st.session_state.shuffled_options_cache[real_idx] = orig_options_list
+
+    # 从缓存中读取选项排列方式
+    active_options = st.session_state.shuffled_options_cache[real_idx]
+    
+    # 构建临时渲染选项与原始选项 A/B/C/D 之间的双向键位映射
+    display_letters = ['A', 'B', 'C', 'D', 'E'][:len(active_options)]
+    display_options = {}
+    map_display_to_orig = {}
+    map_orig_to_display = {}
+    
+    for i, (orig_letter, text) in enumerate(active_options):
+        disp_letter = display_letters[i]
+        display_options[disp_letter] = f"{disp_letter}. {text}"
+        map_display_to_orig[disp_letter] = orig_letter
+        map_orig_to_display[orig_letter] = disp_letter
+
+    # 正确答案及映射后的临时正确答案
     correct_answer = str(row['正确答案']).strip().upper()
-    user_answer = None
+    correct_answer_disp_letters = [map_orig_to_display[l] for l in correct_answer if l in map_orig_to_display]
+    correct_answer_disp_str = "".join(sorted(correct_answer_disp_letters))
+    
+    user_answer_orig = None
+    user_answer_disp_str = None
     
     if row['题型'] == "单选题":
-        choice = st.radio("请点按选择正确答案：", options=list(options.values()), index=None, key=f"q_{real_idx}", label_visibility="collapsed")
+        choice = st.radio("请点按选择正确答案：", options=list(display_options.values()), index=None, key=f"q_{real_idx}", label_visibility="collapsed")
         if choice:
-            user_answer = choice[0]
+            user_answer_disp_str = choice[0]
+            user_answer_orig = map_display_to_orig[user_answer_disp_str]
             
     elif row['题型'] == "多选题":
         st.caption("👈 请勾选所有正确答案：")
-        selected_opts = []
-        for letter, text in options.items():
-            if st.checkbox(text, key=f"q_{real_idx}_{letter}"):
-                selected_opts.append(letter)
-        if selected_opts:
-            user_answer = "".join(sorted(selected_opts))
+        selected_disp_opts = []
+        for disp_letter, text in display_options.items():
+            if st.checkbox(text, key=f"q_{real_idx}_{disp_letter}"):
+                selected_disp_opts.append(disp_letter)
+        if selected_disp_opts:
+            user_answer_disp_str = "".join(sorted(selected_disp_opts))
+            selected_orig_opts = [map_display_to_orig[l] for l in selected_disp_opts]
+            user_answer_orig = "".join(sorted(selected_orig_opts))
 
-    # 7. 答题提交与即时反馈 (移除原有的 st.write 空行)
+    # 7. 答题提交与即时反馈
     if not st.session_state.submitted:
         if st.button("📥 确认提交此题"):
-            if not user_answer:
+            if not user_answer_orig:
                 st.warning("⚠️ 请先勾选或选择您的答案！")
             else:
                 st.session_state.submitted = True
                 st.session_state.total_answered += 1
-                if user_answer == correct_answer:
+                if user_answer_orig == correct_answer:
                     st.session_state.score += 1
                 else:
                     if not any(item['index'] == real_idx for item in st.session_state.wrong_questions):
                         st.session_state.wrong_questions.append({
                             'index': real_idx,
-                            'user_answer': user_answer,
+                            'user_answer': user_answer_orig, # 存原始索引答案以防乱序干扰错题本
                             'correct_answer': correct_answer
                         })
                 st.rerun()
     else:
-        if user_answer == correct_answer:
-            st.success(f"🎉 答对啦！您的答案是: {user_answer}")
+        if user_answer_orig == correct_answer:
+            st.success(f"🎉 答对啦！您的答案是: {user_answer_disp_str}")
         else:
-            st.error(f"❌ 答错啦！您的答案是: {user_answer}，正确答案是: **{correct_answer}**")
+            st.error(f"❌ 答错啦！您的答案是: {user_answer_disp_str}，正确答案是: **{correct_answer_disp_str}**")
             
         st.markdown(f"""
             <div style="background-color: #f0fdf4; border: 1px solid #bbf7d0; padding: 12px; border-radius: 10px; margin-top:5px; margin-bottom:5px;">
                 <span style="color:#15803d; font-weight:700; font-size:13px;">💡 正确答案详情：</span><br/>
                 <span style="color:#1e293b; font-size:13px; line-height:1.4;">
-                    {"<br/>".join([options[l] for l in correct_answer if l in options])}
+                    {"<br/>".join([display_options[l] for l in sorted(correct_answer_disp_letters) if l in display_options])}
                 </span>
             </div>
         """, unsafe_allow_html=True)
@@ -299,6 +335,8 @@ if st.session_state.current_index < len(st.session_state.order):
             st.session_state.current_index = 0
             st.session_state.submitted = False
             st.session_state.wrong_questions = [] 
+            st.session_state.shuffle_options = False # 关闭选项乱序
+            st.session_state.shuffled_options_cache = {} # 清空选项乱序缓存
             st.rerun()
     with c2:
         if st.button("🔄 重置进度从头开始"):
@@ -307,7 +345,19 @@ if st.session_state.current_index < len(st.session_state.order):
             st.session_state.score = 0
             st.session_state.total_answered = 0
             st.session_state.wrong_questions = [] 
+            st.session_state.shuffle_options = False
+            st.session_state.shuffled_options_cache = {}
             st.rerun()
+            
+    # 全尺寸按键：支持“题目”与“选项”同时打乱
+    if st.button("🔥 同时打乱题库和选项顺序"):
+        random.shuffle(st.session_state.order)
+        st.session_state.current_index = 0
+        st.session_state.submitted = False
+        st.session_state.wrong_questions = [] 
+        st.session_state.shuffle_options = True # 开启选项乱序
+        st.session_state.shuffled_options_cache = {} # 清空并重新生成乱序缓存
+        st.rerun()
 else:
     # 9. 刷题结束画面 + 错题本生成
     st.balloons()
@@ -321,6 +371,7 @@ else:
             w_idx = item['index']
             w_row = df.iloc[w_idx]
             
+            # 错题回顾采用标准正向顺序展示，方便思路归纳
             w_options = {}
             for letter in ['A', 'B', 'C', 'D', 'E']:
                 opt_text = w_row.get(f'选项{letter}', '')
@@ -351,6 +402,7 @@ else:
                 st.session_state.score = 0
                 st.session_state.total_answered = 0
                 st.session_state.wrong_questions = [] 
+                st.session_state.shuffled_options_cache = {}
                 st.rerun()
         with col_w2:
             if st.button("🔄 重新挑战完整题库"):
@@ -360,6 +412,7 @@ else:
                 st.session_state.score = 0
                 st.session_state.total_answered = 0
                 st.session_state.wrong_questions = []
+                st.session_state.shuffled_options_cache = {}
                 st.rerun()
     else:
         st.markdown("""
@@ -377,4 +430,5 @@ else:
             st.session_state.score = 0
             st.session_state.total_answered = 0
             st.session_state.wrong_questions = []
+            st.session_state.shuffled_options_cache = {}
             st.rerun()
