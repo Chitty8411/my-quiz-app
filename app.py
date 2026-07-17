@@ -2,7 +2,7 @@ import streamlit as st
 import pandas as pd
 import random
 
-# 针对手机屏幕进行终极美化配置
+# 针对手机屏幕进行终极美化配置，强制折叠侧边栏
 st.set_page_config(
     page_title="泰圣奇知识刷题系统", 
     page_icon="📱", 
@@ -10,7 +10,6 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
-# 注入精美的高级 CSS 样式表 (Roche蓝 & 极光绿配色)
 st.markdown("""
     <style>
     /* 全局背景色调 */
@@ -18,12 +17,12 @@ st.markdown("""
         background-color: #f8fafc;
     }
     
-    /* 强力压缩 Streamlit 容器内部小部件的纵向默认间距 */
+    /* 强力压缩 Streamlit 容器内部小部件的纵向默认间距，确保一屏展示 */
     [data-testid="stVerticalBlock"] > div {
         gap: 0.4rem !important;
     }
     
-    /* 隐藏顶部白边，优化紧凑度，降低内边距 */
+    /* 隐藏顶部白边，降低内边距，挤压出首屏空间 */
     .block-container {
         padding-top: 0.5rem !important;
         padding-bottom: 0.5rem !important;
@@ -108,7 +107,7 @@ st.markdown("""
         box-shadow: 0 1px 2px rgba(0,0,0,0.01) !important;
     }
     
-    /* 鼠标悬浮及点按状态 */
+    /* 鼠标悬浮及点按选项的高亮动效 */
     div[data-testid="stRadio"] label:hover, div[data-testid="stCheckbox"] label:hover {
         border-color: #1a52a5 !important;
         background-color: #f8fafc !important;
@@ -124,7 +123,7 @@ st.markdown("""
     }
     
     /* 提交答案核心按钮 - 高度压缩至 44px 更适合拇指点击 */
-    .stButton>button {
+    .stButton>button[kind="primary"] {
         width: 100% !important;
         height: 44px !important;
         background: linear-gradient(90deg, #1a52a5 0%, #2563eb 100%) !important;
@@ -137,13 +136,13 @@ st.markdown("""
         transition: all 0.2s ease !important;
     }
     
-    .stButton>button:active {
+    .stButton>button[kind="primary"]:active {
         transform: scale(0.98) !important;
         box-shadow: 0 2px 6px rgba(37, 99, 235, 0.15) !important;
     }
     
-    /* 底部辅助小按钮 - 高度同步压缩 */
-    div[data-testid="column"] button {
+    /* 底部辅助小按钮 - 设定浅灰色调 */
+    .stButton>button[kind="secondary"] {
         background-color: #f1f5f9 !important;
         color: #475569 !important;
         font-size: 13px !important;
@@ -151,12 +150,27 @@ st.markdown("""
         border: 1px solid #e2e8f0 !important;
         box-shadow: none !important;
         height: 38px !important;
+        width: 100% !important;
     }
     
-    div[data-testid="column"] button:hover {
+    .stButton>button[kind="secondary"]:hover {
         background-color: #e2e8f0 !important;
         color: #1e293b !important;
         border-color: #cbd5e1 !important;
+    }
+    
+    /* 专门针对并排的两个“打乱”按钮进行精美高档的“罗兰紫”配色定制 */
+    div[data-testid="stHorizontalBlock"] .stButton>button {
+        background: linear-gradient(90deg, #7c3aed 0%, #8b5cf6 100%) !important;
+        color: white !important;
+        border: none !important;
+        box-shadow: 0 4px 10px rgba(124, 58, 246, 0.15) !important;
+        font-weight: 600 !important;
+        font-size: 12px !important;
+    }
+    
+    div[data-testid="stHorizontalBlock"] .stButton>button:active {
+        transform: scale(0.97) !important;
     }
     
     /* 进度条精细化 */
@@ -166,7 +180,6 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-# 3. 加载题库数据
 @st.cache_data
 def load_data():
     df = pd.read_excel("题库(1).xlsx")
@@ -178,7 +191,6 @@ except Exception as e:
     st.error("⚠️ 未找到题库文件，请确保 '题库(1).xlsx' 在 GitHub 仓库的主目录下。")
     st.stop()
 
-# 4. 初始化和保持刷题状态
 if 'current_index' not in st.session_state:
     st.session_state.current_index = 0
 if 'submitted' not in st.session_state:
@@ -190,19 +202,17 @@ if 'total_answered' not in st.session_state:
 if 'order' not in st.session_state:
     st.session_state.order = list(range(len(df)))
 if 'wrong_questions' not in st.session_state:
-    st.session_state.wrong_questions = [] # 用来存放错题
+    st.session_state.wrong_questions = []
 
-# 用于处理选项乱序的新 Session State 变量
+# 用于选项打乱的高级状态缓存机制，避免刷新时选项排序乱跳
 if 'shuffle_options' not in st.session_state:
     st.session_state.shuffle_options = False
 if 'shuffled_options_cache' not in st.session_state:
     st.session_state.shuffled_options_cache = {}
 
-# 5. 顶栏：高级渐变卡片式仪表盘 (使用 Flexbox 强制在手机端并排，永不折行)
 current_num = st.session_state.current_index + 1
 accuracy = int((st.session_state.score / st.session_state.total_answered * 100)) if st.session_state.total_answered > 0 else 0
 
-# 只有没刷完时才显示顶栏状态卡
 if st.session_state.current_index < len(st.session_state.order):
     st.markdown(f"""
         <div style="display: flex; gap: 8px; margin-bottom: 6px; width: 100%;">
@@ -217,10 +227,9 @@ if st.session_state.current_index < len(st.session_state.order):
         </div>
     """, unsafe_allow_html=True)
 
-    # 进度条
+    # 紧凑型进度条
     st.progress((st.session_state.current_index) / len(st.session_state.order) if len(st.session_state.order) > 0 else 0)
 
-# 6. 核心刷题逻辑
 if st.session_state.current_index < len(st.session_state.order):
     real_idx = st.session_state.order[st.session_state.current_index]
     row = df.iloc[real_idx]
@@ -232,14 +241,14 @@ if st.session_state.current_index < len(st.session_state.order):
         </div>
     """, unsafe_allow_html=True)
     
-    # 提取并解析本题原本的所有非空选项
+    # 获取并解析原本的所有有效非空选项
     orig_options_list = []
     for letter in ['A', 'B', 'C', 'D', 'E']:
         opt_text = row.get(f'选项{letter}', '')
         if opt_text:
             orig_options_list.append((letter, opt_text))
             
-    # 如果开启了选项乱序，且当前题目选项还没有生成过乱序缓存，则进行乱序处理
+    # 如果开启了选项乱序，且还未建立当前题目的缓存，则执行洗牌
     if real_idx not in st.session_state.shuffled_options_cache:
         if st.session_state.shuffle_options:
             shuffled_list = list(orig_options_list)
@@ -248,10 +257,10 @@ if st.session_state.current_index < len(st.session_state.order):
         else:
             st.session_state.shuffled_options_cache[real_idx] = orig_options_list
 
-    # 从缓存中读取选项排列方式
+    # 从选项排序缓存中读取当前展示组合
     active_options = st.session_state.shuffled_options_cache[real_idx]
     
-    # 构建临时渲染选项与原始选项 A/B/C/D 之间的双向键位映射
+    # 建立展现的 A/B/C/D 字母与原始答案 A/B/C/D 字母之间的双向精确映射，防止错乱
     display_letters = ['A', 'B', 'C', 'D', 'E'][:len(active_options)]
     display_options = {}
     map_display_to_orig = {}
@@ -263,7 +272,7 @@ if st.session_state.current_index < len(st.session_state.order):
         map_display_to_orig[disp_letter] = orig_letter
         map_orig_to_display[orig_letter] = disp_letter
 
-    # 正确答案及映射后的临时正确答案
+    # 计算映射后的正确答案
     correct_answer = str(row['正确答案']).strip().upper()
     correct_answer_disp_letters = [map_orig_to_display[l] for l in correct_answer if l in map_orig_to_display]
     correct_answer_disp_str = "".join(sorted(correct_answer_disp_letters))
@@ -288,9 +297,8 @@ if st.session_state.current_index < len(st.session_state.order):
             selected_orig_opts = [map_display_to_orig[l] for l in selected_disp_opts]
             user_answer_orig = "".join(sorted(selected_orig_opts))
 
-    # 7. 答题提交与即时反馈
     if not st.session_state.submitted:
-        if st.button("📥 确认提交此题"):
+        if st.button("📥 确认提交此题", type="primary"):
             if not user_answer_orig:
                 st.warning("⚠️ 请先勾选或选择您的答案！")
             else:
@@ -302,7 +310,7 @@ if st.session_state.current_index < len(st.session_state.order):
                     if not any(item['index'] == real_idx for item in st.session_state.wrong_questions):
                         st.session_state.wrong_questions.append({
                             'index': real_idx,
-                            'user_answer': user_answer_orig, # 存原始索引答案以防乱序干扰错题本
+                            'user_answer': user_answer_orig,
                             'correct_answer': correct_answer
                         })
                 st.rerun()
@@ -321,12 +329,11 @@ if st.session_state.current_index < len(st.session_state.order):
             </div>
         """, unsafe_allow_html=True)
         
-        if st.button("➡️ 开启下一题"):
+        if st.button("➡️ 开启下一题", type="primary"):
             st.session_state.current_index += 1
             st.session_state.submitted = False
             st.rerun()
 
-    # 8. 辅助控制面板 - 压缩底部水平分割线和边距
     st.markdown("<hr style='border-top:1px solid #e2e8f0; margin: 8px 0;'/ >", unsafe_allow_html=True)
     c1, c2 = st.columns(2)
     with c1:
@@ -335,31 +342,30 @@ if st.session_state.current_index < len(st.session_state.order):
             st.session_state.current_index = 0
             st.session_state.submitted = False
             st.session_state.wrong_questions = [] 
-            st.session_state.shuffle_options = False # 关闭选项乱序
-            st.session_state.shuffled_options_cache = {} # 清空选项乱序缓存
-            st.rerun()
-    with c2:
-        if st.button("🔄 重置进度从头开始"):
-            st.session_state.current_index = 0
-            st.session_state.submitted = False
-            st.session_state.score = 0
-            st.session_state.total_answered = 0
-            st.session_state.wrong_questions = [] 
             st.session_state.shuffle_options = False
             st.session_state.shuffled_options_cache = {}
             st.rerun()
+    with c2:
+        if st.button("🔥 打乱题库和选项顺序"):
+            random.shuffle(st.session_state.order)
+            st.session_state.current_index = 0
+            st.session_state.submitted = False
+            st.session_state.wrong_questions = [] 
+            st.session_state.shuffle_options = True
+            st.session_state.shuffled_options_cache = {}
+            st.rerun()
             
-    # 全尺寸按键：支持“题目”与“选项”同时打乱
-    if st.button("🔥 同时打乱题库和选项顺序"):
-        random.shuffle(st.session_state.order)
+    # 重置进度移到下方并单独一行摆放，精简低调
+    if st.button("🔄 重置进度从头开始"):
         st.session_state.current_index = 0
         st.session_state.submitted = False
+        st.session_state.score = 0
+        st.session_state.total_answered = 0
         st.session_state.wrong_questions = [] 
-        st.session_state.shuffle_options = True # 开启选项乱序
-        st.session_state.shuffled_options_cache = {} # 清空并重新生成乱序缓存
+        st.session_state.shuffle_options = False
+        st.session_state.shuffled_options_cache = {}
         st.rerun()
 else:
-    # 9. 刷题结束画面 + 错题本生成
     st.balloons()
     st.success(f"🏆 太了不起了！您已经完成了本次全部 {len(st.session_state.order)} 道题目的挑战！")
     
@@ -371,7 +377,6 @@ else:
             w_idx = item['index']
             w_row = df.iloc[w_idx]
             
-            # 错题回顾采用标准正向顺序展示，方便思路归纳
             w_options = {}
             for letter in ['A', 'B', 'C', 'D', 'E']:
                 opt_text = w_row.get(f'选项{letter}', '')
