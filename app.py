@@ -334,7 +334,7 @@ if st.session_state.current_index < len(st.session_state.order):
             user_answer_orig = "".join(sorted(selected_orig_opts))
 
     if not st.session_state.submitted:
-        if st.button("📥 确认提交此题", type="primary"):
+        if st.button("📥 确认提交此题", type="primary", use_container_width=True):
             if not user_answer_orig:
                 st.warning("⚠️ 请先勾选或选择您的答案！")
             else:
@@ -365,7 +365,7 @@ if st.session_state.current_index < len(st.session_state.order):
             </div>
         """, unsafe_allow_html=True)
         
-        if st.button("➡️ 开启下一题", type="primary"):
+        if st.button("➡️ 开启下一题", type="primary", use_container_width=True):
             st.session_state.current_index += 1
             st.session_state.submitted = False
             st.rerun()
@@ -374,7 +374,7 @@ if st.session_state.current_index < len(st.session_state.order):
     
     col_shuffle1, col_shuffle2 = st.columns(2)
     with col_shuffle1:
-        if st.button("🔀 打乱题库顺序", type="secondary"):
+        if st.button("🔀 打乱题库顺序", type="secondary", use_container_width=True):
             random.shuffle(st.session_state.order)
             st.session_state.current_index = 0
             st.session_state.submitted = False
@@ -383,7 +383,7 @@ if st.session_state.current_index < len(st.session_state.order):
             st.session_state.shuffled_options_cache = {}
             st.rerun()
     with col_shuffle2:
-        if st.button("🔥 打乱题库和选项", type="secondary"):
+        if st.button("🔥 打乱题库和选项", type="secondary", use_container_width=True):
             random.shuffle(st.session_state.order)
             st.session_state.current_index = 0
             st.session_state.submitted = False
@@ -393,7 +393,7 @@ if st.session_state.current_index < len(st.session_state.order):
             st.rerun()
         
     # 重置进度按钮（高档蓝色渐变，与提交按钮高度统一）
-    if st.button("🔄 重置进度从头开始", type="primary"):
+    if st.button("🔄 重置进度从头开始", type="primary", use_container_width=True):
         st.session_state.current_index = 0
         st.session_state.submitted = False
         st.session_state.score = 0
@@ -438,7 +438,7 @@ else:
         st.markdown("<br/>", unsafe_allow_html=True)
         col_w1, col_w2 = st.columns(2)
         with col_w1:
-            if st.button("🔥 针对错题重新挑战", type="primary"):
+            if st.button("🔥 针对错题重新挑战", type="primary", use_container_width=True):
                 st.session_state.order = [item['index'] for item in st.session_state.wrong_questions]
                 st.session_state.current_index = 0
                 st.session_state.submitted = False
@@ -448,7 +448,7 @@ else:
                 st.session_state.shuffled_options_cache = {}
                 st.rerun()
         with col_w2:
-            if st.button("🔄 重新挑战完整题库", type="primary"):
+            if st.button("🔄 重新挑战完整题库", type="primary", use_container_width=True):
                 st.session_state.order = list(range(len(df)))
                 st.session_state.current_index = 0
                 st.session_state.submitted = False
@@ -465,8 +465,8 @@ else:
                 <p style="color: #475569; font-size:15px; margin-bottom:0;">您本次没有答错任何题目，满分通过！</p>
             </div>
         """, unsafe_allow_html=True)
-        st.write("")
-        if st.button("🔄 再次挑战完整题库", type="primary"):
+        
+        if st.button("🔄 再次挑战完整题库", type="primary", use_container_width=True):
             st.session_state.order = list(range(len(df)))
             st.session_state.current_index = 0
             st.session_state.submitted = False
