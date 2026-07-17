@@ -195,7 +195,7 @@ st.markdown("""
     }
     
     .question-title {
-        font-size: 15px !important;
+        font-size: 19px !important; /* 调大问题字号，显著提升手机端阅读舒适度 */
         color: #1e293b !important;
         line-height: 1.4 !important;
         font-weight: 700 !important;
@@ -656,7 +656,7 @@ else:
             st.markdown(f"""
                 <div class="wrong-question-card">
                     <span class="question-tag" style="background-color: #fef2f2; color: #991b1b;">📌 错题 {i+1} · {w_row['产品']} · {w_row['题型']}</span>
-                    <div class="question-title" style="font-size:17px !important; margin-bottom: 12px;">{w_row['问题']}</div>
+                    <div class="question-title" style="font-size:19px !important; margin-bottom: 12px;">{w_row['问题']}</div>
                     <div style="font-size:14px; color:#475569; margin-bottom:12px; line-height:1.6;">
                         {"<br/>".join([w_options[l] for l in w_options])}
                     </div>
