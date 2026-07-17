@@ -223,24 +223,24 @@ st.markdown("""
     /* ======================================================== */
     /* 针对结业结算页：个性化定制并排按钮色彩，达成极佳视觉指示 */
     /* ======================================================== */
-    /* 1. 针对错题重新挑战：高能炫目橙红渐变 */
+    /* 1. 针对错题重新挑战：高贵深邃的靛青紫渐变 (Premium Indigo) */
     .stHorizontalBlock > div:nth-child(1) button[kind="primary"] {
-        background: linear-gradient(90deg, #f97316 0%, #ef4444 100%) !important;
-        box-shadow: 0 4px 14px rgba(239, 68, 68, 0.28) !important;
+        background: linear-gradient(90deg, #6366f1 0%, #4f46e5 100%) !important;
+        box-shadow: 0 4px 14px rgba(99, 102, 241, 0.25) !important;
     }
     .stHorizontalBlock > div:nth-child(1) button[kind="primary"]:active {
         transform: scale(0.97) !important;
-        box-shadow: 0 2px 6px rgba(239, 68, 68, 0.15) !important;
+        box-shadow: 0 2px 6px rgba(99, 102, 241, 0.15) !important;
     }
 
-    /* 2. 重新挑战完整题库：清新璀璨翡翠绿渐变 */
+    /* 2. 重新挑战完整题库：内敛科技感的石板灰蓝渐变 (Slate Blue) */
     .stHorizontalBlock > div:nth-child(2) button[kind="primary"] {
-        background: linear-gradient(90deg, #10b981 0%, #059669 100%) !important;
-        box-shadow: 0 4px 14px rgba(16, 185, 129, 0.28) !important;
+        background: linear-gradient(90deg, #475569 0%, #334155 100%) !important;
+        box-shadow: 0 4px 14px rgba(71, 85, 105, 0.25) !important;
     }
     .stHorizontalBlock > div:nth-child(2) button[kind="primary"]:active {
         transform: scale(0.97) !important;
-        box-shadow: 0 2px 6px rgba(16, 185, 129, 0.15) !important;
+        box-shadow: 0 2px 6px rgba(71, 85, 105, 0.15) !important;
     }
     </style>
 """, unsafe_allow_html=True)
