@@ -4,6 +4,7 @@ import random
 import time
 import streamlit.components.v1 as components
 
+# 设置紧凑的一体化移动端布局
 st.set_page_config(
     page_title="泰圣奇知识刷题系统", 
     page_icon="📱", 
@@ -97,6 +98,27 @@ st.markdown("""
         .stButton > button, .stButton > button * {
             color: #ffffff !important;
         }
+
+        /* 5. 战报卡片专属暗色拦截：锁死白天渐变色与高亮对比字体 */
+        .report-card {
+            background: linear-gradient(135deg, #0f2b5c 0%, #1a52a5 100%) !important;
+            color: #ffffff !important;
+        }
+        .report-card-title, .report-card-subtitle, .report-grid-label, .report-grid-value, .report-card-footer {
+            color: #ffffff !important;
+        }
+        .report-card-footer {
+            color: #f3f4f6 !important;
+        }
+        .report-green {
+            color: #10b981 !important;
+        }
+        .report-light-green {
+            color: #34d399 !important;
+        }
+        .report-red {
+            color: #f87171 !important;
+        }
     }
     
     /* ========================================================
@@ -132,6 +154,74 @@ st.markdown("""
     /* 全局网页背景色调 */
     .stApp {
         background-color: #f8fafc !important;
+    }
+    
+    /* ========================================================
+       【终极战报卡片专属样式】彻底锁定高亮白色、亮绿、亮红字体，防止任何黑化
+       ======================================================== */
+    .report-card {
+        background: linear-gradient(135deg, #0f2b5c 0%, #1a52a5 100%) !important;
+        color: #ffffff !important;
+        padding: 45px 16px !important;
+        border-radius: 16px !important;
+        box-shadow: 0 10px 25px rgba(26, 82, 165, 0.15) !important;
+        margin-top: 8px !important;
+        margin-bottom: 16px !important;
+        text-align: center !important;
+    }
+    .report-card-title {
+        font-size: 22px !important;
+        font-weight: 800 !important;
+        margin-bottom: 10px !important;
+        letter-spacing: 0.5px !important;
+        color: #ffffff !important;
+    }
+    .report-card-subtitle {
+        font-size: 13px !important;
+        opacity: 0.8 !important;
+        margin-bottom: 24px !important;
+        color: #ffffff !important;
+    }
+    .report-grid {
+        display: grid !important;
+        grid-template-columns: 1fr 1fr !important;
+        gap: 12px !important;
+        margin-bottom: 24px !important;
+    }
+    .report-grid-item {
+        background: rgba(255, 255, 255, 0.1) !important;
+        padding: 12px !important;
+        border-radius: 12px !important;
+        text-align: center !important;
+        border: 1px solid rgba(255,255,255,0.05) !important;
+    }
+    .report-grid-label {
+        font-size: 11px !important;
+        opacity: 0.9 !important;
+        margin-bottom: 3px !important;
+        color: rgba(255, 255, 255, 0.9) !important;
+    }
+    .report-grid-value {
+        font-size: 16px !important;
+        font-weight: 700 !important;
+        color: #ffffff !important;
+    }
+    .report-card-footer {
+        border-top: 1px solid rgba(255, 255, 255, 0.15) !important;
+        padding-top: 16px !important;
+        font-size: 13px !important;
+        font-weight: 700 !important;
+        color: #f3f4f6 !important;
+        letter-spacing: 0.5px !important;
+    }
+    .report-green {
+        color: #10b981 !important;
+    }
+    .report-light-green {
+        color: #34d399 !important;
+    }
+    .report-red {
+        color: #f87171 !important;
     }
     
     /* ========================================================
@@ -194,10 +284,11 @@ st.markdown("""
         margin-bottom: 6px;
     }
     
+    /* 50道主问题字号精细调大：字号扩充到19px，高可读性 */
     .question-title {
-        font-size: 19px !important; /* 调大问题字号，显著提升手机端阅读舒适度 */
+        font-size: 19px !important;
         color: #1e293b !important;
-        line-height: 1.4 !important;
+        line-height: 1.45 !important;
         font-weight: 700 !important;
     }
     
@@ -583,28 +674,28 @@ else:
 
     # 精美渐变结业战报 HTML 卡片展示在最上方 - 极致贴顶并拉高上下高度(padding: 45px 16px)
     st.markdown(f"""
-        <div style="background: linear-gradient(135deg, #0f2b5c 0%, #1a52a5 100%); color: white !important; padding: 45px 16px; border-radius: 16px; box-shadow: 0 10px 25px rgba(26, 82, 165, 0.15); margin-top: 8px; margin-bottom: 16px; text-align: center;">
-            <div style="font-size: 22px; font-weight: 800; margin-bottom: 10px; letter-spacing: 0.5px; color: #ffffff !important;">🏆 泰圣奇刷题结业战报</div>
-            <div style="font-size: 13px; opacity: 0.8; margin-bottom: 24px; color: #ffffff !important;">恭喜您完成了本次的全部挑战！</div>
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 24px;">
-                <div style="background: rgba(255, 255, 255, 0.1); padding: 12px; border-radius: 12px; text-align: center; border: 1px solid rgba(255,255,255,0.05);">
-                    <div style="font-size: 11px; opacity: 0.8; margin-bottom: 3px; color: rgba(255,255,255,0.8) !important;">⏱️ 刷题用时</div>
-                    <div style="font-size: 16px; font-weight: 700; color: #ffffff !important;">{time_display_str}</div>
+        <div class="report-card">
+            <div class="report-card-title">🏆 泰圣奇刷题结业战报</div>
+            <div class="report-card-subtitle">恭喜您完成了本次的全部挑战！</div>
+            <div class="report-grid">
+                <div class="report-grid-item">
+                    <div class="report-grid-label">⏱️ 刷题用时</div>
+                    <div class="report-grid-value">{time_display_str}</div>
                 </div>
-                <div style="background: rgba(255, 255, 255, 0.1); padding: 12px; border-radius: 12px; text-align: center; border: 1px solid rgba(255,255,255,0.05);">
-                    <div style="font-size: 11px; opacity: 0.8; margin-bottom: 3px; color: rgba(255,255,255,0.8) !important;">🎯 本次胜率</div>
-                    <div style="font-size: 16px; font-weight: 700; color: #10b981 !important;">{final_accuracy}%</div>
+                <div class="report-grid-item">
+                    <div class="report-grid-label">🎯 本次胜率</div>
+                    <div class="report-grid-value report-green">{final_accuracy}%</div>
                 </div>
-                <div style="background: rgba(255, 255, 255, 0.1); padding: 12px; border-radius: 12px; text-align: center; border: 1px solid rgba(255,255,255,0.05);">
-                    <div style="font-size: 11px; opacity: 0.8; margin-bottom: 3px; color: rgba(255,255,255,0.8) !important;">✅ 答对题数</div>
-                    <div style="font-size: 16px; font-weight: 700; color: #34d399 !important;">{st.session_state.score} 题</div>
+                <div class="report-grid-item">
+                    <div class="report-grid-label">✅ 答对题数</div>
+                    <div class="report-grid-value report-light-green">{st.session_state.score} 题</div>
                 </div>
-                <div style="background: rgba(255, 255, 255, 0.1); padding: 12px; border-radius: 12px; text-align: center; border: 1px solid rgba(255,255,255,0.05);">
-                    <div style="font-size: 11px; opacity: 0.8; margin-bottom: 3px; color: rgba(255,255,255,0.8) !important;">❌ 答错题数</div>
-                    <div style="font-size: 16px; font-weight: 700; color: #f87171 !important;">{len(st.session_state.wrong_questions)} 题</div>
+                <div class="report-grid-item">
+                    <div class="report-grid-label">❌ 答错题数</div>
+                    <div class="report-grid-value report-red">{len(st.session_state.wrong_questions)} 题</div>
                 </div>
             </div>
-            <div style="border-top: 1px solid rgba(255, 255, 255, 0.15); padding-top: 16px; font-size: 13px; font-weight: 700; color: #f3f4f6 !important; letter-spacing: 0.5px;">
+            <div class="report-card-footer">
                 {grade_comment}
             </div>
         </div>
