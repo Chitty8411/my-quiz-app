@@ -87,7 +87,7 @@ st.markdown("""
         font-weight: 700 !important;
     }
     
-    /* 选项框的完美卡片化包装 (核心美化) */
+    /* 选项框的完美卡片化包装 */
     div[data-testid="stRadio"] label, div[data-testid="stCheckbox"] label {
         display: flex;
         align-items: center;
@@ -101,7 +101,7 @@ st.markdown("""
         box-shadow: 0 2px 4px rgba(0,0,0,0.01) !important;
     }
     
-    /* 鼠标悬浮及点按状态（手机端有触控放大微动效） */
+    /* 鼠标悬浮及点按状态 */
     div[data-testid="stRadio"] label:hover, div[data-testid="stCheckbox"] label:hover {
         border-color: #1a52a5 !important;
         background-color: #f8fafc !important;
@@ -183,7 +183,7 @@ if 'total_answered' not in st.session_state:
 if 'order' not in st.session_state:
     st.session_state.order = list(range(len(df)))
 if 'wrong_questions' not in st.session_state:
-    st.session_state.wrong_questions = [] # 用来存放错题：[{'index': real_idx, 'user_answer': xx, 'correct_answer': xx}]
+    st.session_state.wrong_questions = [] # 用来存放错题
 
 # 5. 顶栏：高级渐变卡片式仪表盘
 current_num = st.session_state.current_index + 1
@@ -207,16 +207,15 @@ if st.session_state.current_index < len(st.session_state.order):
             </div>
         """, unsafe_allow_html=True)
 
-    # 渲染扁平化的优雅进度条
+    # 进度条
     st.progress((st.session_state.current_index) / len(st.session_state.order) if len(st.session_state.order) > 0 else 0)
-    st.write("") # 留空增加呼吸感
+    st.write("") 
 
 # 6. 核心刷题逻辑
 if st.session_state.current_index < len(st.session_state.order):
     real_idx = st.session_state.order[st.session_state.current_index]
     row = df.iloc[real_idx]
     
-    # 渲染卡片式问题区域
     st.markdown(f"""
         <div class="question-card">
             <span class="question-tag">🏷️ {row['产品']} · {row['题型']}</span>
@@ -259,7 +258,6 @@ if st.session_state.current_index < len(st.session_state.order):
                 if user_answer == correct_answer:
                     st.session_state.score += 1
                 else:
-                    # 答错时，将题目索引和答案信息存入错题集
                     if not any(item['index'] == real_idx for item in st.session_state.wrong_questions):
                         st.session_state.wrong_questions.append({
                             'index': real_idx,
@@ -268,13 +266,11 @@ if st.session_state.current_index < len(st.session_state.order):
                         })
                 st.rerun()
     else:
-        # 美化答题对错的反馈卡片
         if user_answer == correct_answer:
             st.success(f"🎉 答对啦！您的答案是: {user_answer}")
         else:
             st.error(f"❌ 答错啦！您的答案是: {user_answer}，正确答案是: **{correct_answer}**")
             
-        # 详尽的选项解析展示
         st.markdown(f"""
             <div style="background-color: #f0fdf4; border: 1px solid #bbf7d0; padding: 16px; border-radius: 12px; margin-top:10px; margin-bottom:15px;">
                 <span style="color:#15803d; font-weight:700; font-size:15px;">💡 正确答案详情：</span><br/>
@@ -289,7 +285,7 @@ if st.session_state.current_index < len(st.session_state.order):
             st.session_state.submitted = False
             st.rerun()
 
-    # 8. 辅助控制面板（打乱、重置）
+    # 8. 辅助控制面板
     st.markdown("<br/><hr style='border-top:1px solid #e2e8f0;'/><br/>", unsafe_allow_html=True)
     c1, c2 = st.columns(2)
     with c1:
@@ -297,7 +293,7 @@ if st.session_state.current_index < len(st.session_state.order):
             random.shuffle(st.session_state.order)
             st.session_state.current_index = 0
             st.session_state.submitted = False
-            st.session_state.wrong_questions = [] # 重置错题
+            st.session_state.wrong_questions = [] 
             st.rerun()
     with c2:
         if st.button("🔄 重置进度从头开始"):
@@ -305,14 +301,13 @@ if st.session_state.current_index < len(st.session_state.order):
             st.session_state.submitted = False
             st.session_state.score = 0
             st.session_state.total_answered = 0
-            st.session_state.wrong_questions = [] # 重置错题
+            st.session_state.wrong_questions = [] 
             st.rerun()
 else:
     # 9. 刷题结束画面 + 错题本生成
     st.balloons()
     st.success(f"🏆 太了不起了！您已经完成了本次全部 {len(st.session_state.order)} 道题目的挑战！")
     
-    # 检查是否有错题
     if st.session_state.wrong_questions:
         st.markdown(f"### ❌ 本轮错题集回顾 ({len(st.session_state.wrong_questions)} 题)")
         st.caption("以下是您刚刚答错的题目，请仔细看答案对比进行复习：")
@@ -321,14 +316,12 @@ else:
             w_idx = item['index']
             w_row = df.iloc[w_idx]
             
-            # 重建题目选项
             w_options = {}
             for letter in ['A', 'B', 'C', 'D', 'E']:
                 opt_text = w_row.get(f'选项{letter}', '')
                 if opt_text:
                     w_options[letter] = f"{letter}. {opt_text}"
             
-            # 用专门的红色边框卡片渲染错题
             st.markdown(f"""
                 <div class="wrong-question-card">
                     <span class="question-tag" style="background-color: #fef2f2; color: #991b1b;">📌 错题 {i+1} · {w_row['产品']} · {w_row['题型']}</span>
@@ -343,18 +336,16 @@ else:
                 </div>
             """, unsafe_allow_html=True)
             
-        # 底部控制区：允许只重刷错题
         st.markdown("<br/>", unsafe_allow_html=True)
         col_w1, col_w2 = st.columns(2)
         with col_w1:
             if st.button("🔥 针对错题重新挑战"):
-                # 将题库顺序重置为仅包含答错的题目
                 st.session_state.order = [item['index'] for item in st.session_state.wrong_questions]
                 st.session_state.current_index = 0
                 st.session_state.submitted = False
                 st.session_state.score = 0
                 st.session_state.total_answered = 0
-                st.session_state.wrong_questions = [] # 清空本轮错题，准备记录新一轮的错题
+                st.session_state.wrong_questions = [] 
                 st.rerun()
         with col_w2:
             if st.button("🔄 重新挑战完整题库"):
@@ -366,7 +357,6 @@ else:
                 st.session_state.wrong_questions = []
                 st.rerun()
     else:
-        # 如果是完美的 100% 正确率
         st.markdown("""
             <div style="background-color: #f0fdf4; border: 1px solid #bbf7d0; padding: 25px; border-radius: 16px; text-align: center; margin-top: 20px; box-shadow: 0 4px 12px rgba(16, 185, 129, 0.08);">
                 <span style="font-size: 48px;">💯</span>
@@ -383,17 +373,3 @@ else:
             st.session_state.total_answered = 0
             st.session_state.wrong_questions = []
             st.rerun()
-```
-
----
-
-### 🛠️ 同步步骤回顾：
-1. **替换代码**：点击编辑你 GitHub Codespaces 里的 `app.py`，全选并用上面的新代码覆盖它。
-2. **保存代码**：按下键盘上的 `Ctrl + S`（Mac 电脑按 `Command + S`）进行保存。
-3. **推送代码**：
-   * 点击左边那排图标中第 3 个（分支树枝形状图标）。
-   * 在 `Message` 框中填入：`新增错题集功能`。
-   * 点击 **`Commit`**（或灰色的提交），接着点击蓝色的 **`Sync Changes`** 同步更改。
-4. **测试效果**：同步完毕后，拿起手机刷新你的刷题页面。你可以故意答错几道题测试一下，当刷到最后一题结束时，你就会看到这个惊艳的错题总结报告了！
-
-快去同步一下新代码并用手机测试吧！如果有任何报错，随时告诉我！
