@@ -141,7 +141,7 @@ st.markdown("""
         box-shadow: 0 2px 6px rgba(37, 99, 235, 0.15) !important;
     }
     
-    /* 底部辅助小按钮 (打乱题库顺序按钮) - 设定精美高档的“罗兰紫”配色 */
+    /* 底部辅助小按钮 (打乱题库顺序等按钮) - 设定精美高档的“罗兰紫”配色 */
     .stButton>button[kind="secondary"] {
         background: linear-gradient(90deg, #7c3aed 0%, #8b5cf6 100%) !important;
         color: white !important;
@@ -162,6 +162,17 @@ st.markdown("""
     
     .stButton>button[kind="secondary"]:active {
         transform: scale(0.97) !important;
+    }
+    
+    /* 强制在移动端 st.columns 保持并排，永不折行换位 */
+    div[data-testid="stHorizontalBlock"] {
+        flex-direction: row !important;
+        gap: 0.5rem !important;
+    }
+    div[data-testid="stHorizontalBlock"] > div[data-testid="column"] {
+        width: calc(50% - 0.25rem) !important;
+        flex: 1 1 calc(50% - 0.25rem) !important;
+        min-width: calc(50% - 0.25rem) !important;
     }
     
     /* 进度条精细化 */
@@ -327,17 +338,28 @@ if st.session_state.current_index < len(st.session_state.order):
 
     st.markdown("<hr style='border-top:1px solid #e2e8f0; margin: 8px 0;'/ >", unsafe_allow_html=True)
     
-    # 打乱顺序按钮（罗兰紫）
-    if st.button("🔀 打乱题库顺序", type="secondary"):
-        random.shuffle(st.session_state.order)
-        st.session_state.current_index = 0
-        st.session_state.submitted = False
-        st.session_state.wrong_questions = [] 
-        st.session_state.shuffle_options = False
-        st.session_state.shuffled_options_cache = {}
-        st.rerun()
+    # 并列放置“打乱题库顺序”和“打乱题库和选项”
+    col_shuffle1, col_shuffle2 = st.columns(2)
+    with col_shuffle1:
+        if st.button("🔀 打乱题库顺序", type="secondary"):
+            random.shuffle(st.session_state.order)
+            st.session_state.current_index = 0
+            st.session_state.submitted = False
+            st.session_state.wrong_questions = [] 
+            st.session_state.shuffle_options = False
+            st.session_state.shuffled_options_cache = {}
+            st.rerun()
+    with col_shuffle2:
+        if st.button("🔥 打乱题库和选项", type="secondary"):
+            random.shuffle(st.session_state.order)
+            st.session_state.current_index = 0
+            st.session_state.submitted = False
+            st.session_state.wrong_questions = [] 
+            st.session_state.shuffle_options = True
+            st.session_state.shuffled_options_cache = {}
+            st.rerun()
         
-    # 重置进度按钮（高档皇家蓝，等同于主提交色）
+    # 重置进度按钮（高档蓝色渐变，与提交按钮相同）
     if st.button("🔄 重置进度从头开始", type="primary"):
         st.session_state.current_index = 0
         st.session_state.submitted = False
