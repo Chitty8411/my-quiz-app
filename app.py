@@ -223,24 +223,27 @@ st.markdown("""
     /* ======================================================== */
     /* 针对结业结算页：个性化定制并排按钮色彩，达成极佳视觉指示 */
     /* ======================================================== */
-    /* 1. 针对错题重新挑战：高贵深邃的靛青紫渐变 (Premium Indigo) */
+    /* 1. 针对错题重新挑战：高贵深邃的深蓝色系 (Deep Royal Blue) */
     .stHorizontalBlock > div:nth-child(1) button[kind="primary"] {
-        background: linear-gradient(90deg, #6366f1 0%, #4f46e5 100%) !important;
-        box-shadow: 0 4px 14px rgba(99, 102, 241, 0.25) !important;
+        background: linear-gradient(90deg, #0f2b5c 0%, #1a52a5 100%) !important;
+        box-shadow: 0 4px 14px rgba(26, 82, 165, 0.25) !important;
+        color: white !important;
     }
     .stHorizontalBlock > div:nth-child(1) button[kind="primary"]:active {
         transform: scale(0.97) !important;
-        box-shadow: 0 2px 6px rgba(99, 102, 241, 0.15) !important;
+        box-shadow: 0 2px 6px rgba(26, 82, 165, 0.15) !important;
     }
 
-    /* 2. 重新挑战完整题库：内敛科技感的石板灰蓝渐变 (Slate Blue) */
+    /* 2. 重新挑战完整题库：清爽优雅的浅蓝色系 (Soft Sky Blue) */
     .stHorizontalBlock > div:nth-child(2) button[kind="primary"] {
-        background: linear-gradient(90deg, #475569 0%, #334155 100%) !important;
-        box-shadow: 0 4px 14px rgba(71, 85, 105, 0.25) !important;
+        background: linear-gradient(90deg, #e0f2fe 0%, #bae6fd 100%) !important;
+        box-shadow: 0 4px 14px rgba(186, 230, 253, 0.3) !important;
+        color: #0369a1 !important;
+        border: 1px solid #7dd3fc !important;
     }
     .stHorizontalBlock > div:nth-child(2) button[kind="primary"]:active {
         transform: scale(0.97) !important;
-        box-shadow: 0 2px 6px rgba(71, 85, 105, 0.15) !important;
+        box-shadow: 0 2px 6px rgba(186, 230, 253, 0.15) !important;
     }
     </style>
 """, unsafe_allow_html=True)
@@ -501,7 +504,7 @@ else:
 
     # 精美渐变结业战报 HTML 卡片展示在最上方 - 极致贴顶并拉高上下高度(padding: 45px 16px)
     st.markdown(f"""
-        <div style="background: linear-gradient(135deg, #0f2b5c 0%, #1e40af 100%); color: white; padding: 45px 16px; border-radius: 16px; box-shadow: 0 10px 25px rgba(30, 64, 175, 0.15); margin-top: 8px; margin-bottom: 16px; text-align: center;">
+        <div style="background: linear-gradient(135deg, #1a52a5 0%, #2563eb 100%); color: white; padding: 45px 16px; border-radius: 16px; box-shadow: 0 10px 25px rgba(37, 99, 235, 0.15); margin-top: 8px; margin-bottom: 16px; text-align: center;">
             <div style="font-size: 22px; font-weight: 800; margin-bottom: 10px; letter-spacing: 0.5px;">🏆 泰圣奇刷题结业战报</div>
             <div style="font-size: 13px; opacity: 0.8; margin-bottom: 24px;">恭喜您完成了本次的全部挑战！</div>
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 24px;">
