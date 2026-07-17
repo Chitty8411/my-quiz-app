@@ -122,7 +122,7 @@ st.markdown("""
         font-weight: 500 !important;
     }
     
-    /* 提交答案核心按钮 - 高度压缩至 44px 更适合拇指点击 */
+    /* 提交答案和重置进度核心按钮 - 高度压缩至 44px 更适合拇指点击，蓝色渐变 */
     .stButton>button[kind="primary"] {
         width: 100% !important;
         height: 44px !important;
@@ -141,35 +141,26 @@ st.markdown("""
         box-shadow: 0 2px 6px rgba(37, 99, 235, 0.15) !important;
     }
     
-    /* 底部辅助小按钮 - 设定浅灰色调 */
+    /* 底部辅助小按钮 (打乱题库顺序按钮) - 设定精美高档的“罗兰紫”配色 */
     .stButton>button[kind="secondary"] {
-        background-color: #f1f5f9 !important;
-        color: #475569 !important;
-        font-size: 13px !important;
+        background: linear-gradient(90deg, #7c3aed 0%, #8b5cf6 100%) !important;
+        color: white !important;
+        font-size: 14px !important;
+        font-weight: 600 !important;
         border-radius: 10px !important;
-        border: 1px solid #e2e8f0 !important;
-        box-shadow: none !important;
-        height: 38px !important;
+        border: none !important;
+        box-shadow: 0 4px 10px rgba(124, 58, 246, 0.15) !important;
+        height: 44px !important;
         width: 100% !important;
+        transition: all 0.2s ease !important;
     }
     
     .stButton>button[kind="secondary"]:hover {
-        background-color: #e2e8f0 !important;
-        color: #1e293b !important;
-        border-color: #cbd5e1 !important;
+        background: linear-gradient(90deg, #6d28d9 0%, #7c3aed 100%) !important;
+        box-shadow: 0 6px 12px rgba(124, 58, 246, 0.25) !important;
     }
     
-    /* 专门针对并排的两个“打乱”按钮进行精美高档的“罗兰紫”配色定制 */
-    div[data-testid="stHorizontalBlock"] .stButton>button {
-        background: linear-gradient(90deg, #7c3aed 0%, #8b5cf6 100%) !important;
-        color: white !important;
-        border: none !important;
-        box-shadow: 0 4px 10px rgba(124, 58, 246, 0.15) !important;
-        font-weight: 600 !important;
-        font-size: 12px !important;
-    }
-    
-    div[data-testid="stHorizontalBlock"] .stButton>button:active {
+    .stButton>button[kind="secondary"]:active {
         transform: scale(0.97) !important;
     }
     
@@ -335,28 +326,19 @@ if st.session_state.current_index < len(st.session_state.order):
             st.rerun()
 
     st.markdown("<hr style='border-top:1px solid #e2e8f0; margin: 8px 0;'/ >", unsafe_allow_html=True)
-    c1, c2 = st.columns(2)
-    with c1:
-        if st.button("🔀 打乱题库顺序"):
-            random.shuffle(st.session_state.order)
-            st.session_state.current_index = 0
-            st.session_state.submitted = False
-            st.session_state.wrong_questions = [] 
-            st.session_state.shuffle_options = False
-            st.session_state.shuffled_options_cache = {}
-            st.rerun()
-    with c2:
-        if st.button("🔥 打乱题库和选项顺序"):
-            random.shuffle(st.session_state.order)
-            st.session_state.current_index = 0
-            st.session_state.submitted = False
-            st.session_state.wrong_questions = [] 
-            st.session_state.shuffle_options = True
-            st.session_state.shuffled_options_cache = {}
-            st.rerun()
-            
-    # 重置进度移到下方并单独一行摆放，精简低调
-    if st.button("🔄 重置进度从头开始"):
+    
+    # 打乱顺序按钮（罗兰紫）
+    if st.button("🔀 打乱题库顺序", type="secondary"):
+        random.shuffle(st.session_state.order)
+        st.session_state.current_index = 0
+        st.session_state.submitted = False
+        st.session_state.wrong_questions = [] 
+        st.session_state.shuffle_options = False
+        st.session_state.shuffled_options_cache = {}
+        st.rerun()
+        
+    # 重置进度按钮（高档皇家蓝，等同于主提交色）
+    if st.button("🔄 重置进度从头开始", type="primary"):
         st.session_state.current_index = 0
         st.session_state.submitted = False
         st.session_state.score = 0
@@ -365,6 +347,7 @@ if st.session_state.current_index < len(st.session_state.order):
         st.session_state.shuffle_options = False
         st.session_state.shuffled_options_cache = {}
         st.rerun()
+
 else:
     st.balloons()
     st.success(f"🏆 太了不起了！您已经完成了本次全部 {len(st.session_state.order)} 道题目的挑战！")
@@ -400,7 +383,7 @@ else:
         st.markdown("<br/>", unsafe_allow_html=True)
         col_w1, col_w2 = st.columns(2)
         with col_w1:
-            if st.button("🔥 针对错题重新挑战"):
+            if st.button("🔥 针对错题重新挑战", type="primary"):
                 st.session_state.order = [item['index'] for item in st.session_state.wrong_questions]
                 st.session_state.current_index = 0
                 st.session_state.submitted = False
@@ -410,7 +393,7 @@ else:
                 st.session_state.shuffled_options_cache = {}
                 st.rerun()
         with col_w2:
-            if st.button("🔄 重新挑战完整题库"):
+            if st.button("🔄 重新挑战完整题库", type="primary"):
                 st.session_state.order = list(range(len(df)))
                 st.session_state.current_index = 0
                 st.session_state.submitted = False
@@ -428,7 +411,7 @@ else:
             </div>
         """, unsafe_allow_html=True)
         st.write("")
-        if st.button("🔄 再次挑战完整题库"):
+        if st.button("🔄 再次挑战完整题库", type="primary"):
             st.session_state.order = list(range(len(df)))
             st.session_state.current_index = 0
             st.session_state.submitted = False
