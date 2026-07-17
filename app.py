@@ -164,16 +164,18 @@ st.markdown("""
         transform: scale(0.97) !important;
     }
     
-    /* 强制在移动端 st.columns 保持并排，永不折行换位 */
+    /* 强制在移动端 st.columns 保持并排，永不折行换位，且完美等分消除溢出 */
     div[data-testid="stHorizontalBlock"] {
         flex-direction: row !important;
         flex-wrap: nowrap !important;
         gap: 0.5rem !important;
+        width: 100% !important;
     }
     div[data-testid="stHorizontalBlock"] [data-testid="column"] {
         width: calc(50% - 0.25rem) !important;
-        flex: 1 1 calc(50% - 0.25rem) !important;
-        min-width: calc(50% - 0.25rem) !important;
+        flex: 1 1 0% !important; /* 强制等宽分配，无视子内容大小 */
+        min-width: 0 !important;  /* 关键：强行击碎 Streamlit 默认的 250px 限制，防止溢出屏幕 */
+        max-width: calc(50% - 0.25rem) !important;
     }
     
     /* 进度条精细化 */
@@ -194,6 +196,7 @@ except Exception as e:
     st.error("⚠️ 未找到题库文件，请确保 '题库(1).xlsx' 在 GitHub 仓库的主目录下。")
     st.stop()
 
+# 初始化全局会话状态
 if 'current_index' not in st.session_state:
     st.session_state.current_index = 0
 if 'submitted' not in st.session_state:
@@ -343,6 +346,7 @@ if st.session_state.current_index < len(st.session_state.order):
 
     st.markdown("<hr style='border-top:1px solid #e2e8f0; margin: 8px 0;'/ >", unsafe_allow_html=True)
     
+    # 使用 st.columns 在底层，配合上面精修的 CSS 在移动端强力实现 50% 1:1 绝对等宽并列
     col_shuffle1, col_shuffle2 = st.columns(2)
     with col_shuffle1:
         if st.button("🔀 打乱题库顺序", type="secondary"):
