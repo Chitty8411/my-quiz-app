@@ -128,7 +128,7 @@ st.markdown("""
         height: 44px !important;
         background: linear-gradient(90deg, #1a52a5 0%, #2563eb 100%) !important;
         color: white !important;
-        font-size: 16px !important;
+        font-size: 15px !important;
         font-weight: 600 !important;
         border-radius: 10px !important;
         border: none !important;
@@ -186,6 +186,22 @@ st.markdown("""
         min-width: 0 !important;
         max-width: 100% !important;
         width: 100% !important;
+    }
+
+    /* 【终极奥义】针对并行小按钮内部的 padding 和文字换行进行深度控制，打碎 white-space: nowrap */
+    div[data-testid="stHorizontalBlock"] button {
+        padding-left: 2px !important;
+        padding-right: 2px !important;
+    }
+
+    div[data-testid="stHorizontalBlock"] button p,
+    div[data-testid="stHorizontalBlock"] button span {
+        font-size: 11px !important; /* 降低字号，确保在超窄屏下也能塞得进 */
+        white-space: normal !important; /* 允许在极窄屏幕下进行优雅换行，绝不允许挤压容器宽度 */
+        line-height: 1.1 !important;
+        letter-spacing: -0.6px !important; /* 稍微压缩字间距 */
+        text-align: center !important;
+        display: block !important;
     }
     
     /* 进度条精细化 */
