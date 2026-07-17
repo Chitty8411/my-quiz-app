@@ -164,8 +164,9 @@ st.markdown("""
         transform: scale(0.97) !important;
     }
     
-    /* 强制在移动端 st.columns 保持并排，永不折行换位，且完美等分消除溢出 */
+    /* 【核心突破】强力穿透并覆盖移动端所有 st.columns 的最小宽度限制，使其 100% 精准平分 */
     div[data-testid="stHorizontalBlock"] {
+        display: flex !important;
         flex-direction: row !important;
         flex-wrap: nowrap !important;
         gap: 0.5rem !important;
@@ -174,8 +175,13 @@ st.markdown("""
     div[data-testid="stHorizontalBlock"] [data-testid="column"] {
         width: calc(50% - 0.25rem) !important;
         flex: 1 1 0% !important; /* 强制等宽分配，无视子内容大小 */
-        min-width: 0 !important;  /* 关键：强行击碎 Streamlit 默认的 250px 限制，防止溢出屏幕 */
+        min-width: 0 !important;  /* 强行击碎 Streamlit 默认的 250px 限制 */
         max-width: calc(50% - 0.25rem) !important;
+    }
+    /* 强力向下递归清理，击碎任何深层嵌套子容器自带的 250px 限制，彻底消灭屏幕溢出 */
+    div[data-testid="stHorizontalBlock"] [data-testid="column"] div {
+        min-width: 0 !important;
+        max-width: 100% !important;
     }
     
     /* 进度条精细化 */
@@ -220,6 +226,7 @@ current_num = st.session_state.current_index + 1
 accuracy = int((st.session_state.score / st.session_state.total_answered * 100)) if st.session_state.total_answered > 0 else 0
 
 if st.session_state.current_index < len(st.session_state.order):
+    # 使用原生 Flexbox 高级排版机制替代 st.columns，强力锁定手机屏幕并排
     st.markdown(f"""
         <div style="display: flex; gap: 8px; margin-bottom: 6px; width: 100%;">
             <div class="dashboard-card" style="flex: 1; margin-bottom: 0;">
@@ -450,3 +457,5 @@ else:
             st.session_state.wrong_questions = []
             st.session_state.shuffled_options_cache = {}
             st.rerun()
+```
+`eof`
